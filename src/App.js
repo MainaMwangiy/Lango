@@ -1,10 +1,17 @@
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
+import { HomeLayout } from './components/HomeLayout';
+import config from './components/config';
 
 function App() {
+  console.log("config", config)
   return (
-    <div className="App">
-      Welcome to Lango
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomeLayout configKey="Home" {...config} />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
