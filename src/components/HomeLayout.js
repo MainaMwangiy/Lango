@@ -4,6 +4,7 @@ import theme from '../theme';
 import config from './config';
 import { Button, Typography } from '@mui/material';
 import { Loader } from './Loader';
+import { useNavigate } from 'react-router';
 
 const useStyles = makeStyles({
     root: (props) => ({
@@ -56,7 +57,7 @@ const useStyles = makeStyles({
     buttonComponent: {
         backgroundColor: theme.colors.secondary,
         padding: '10px 20px',
-        borderRadius: '50px',
+        borderRadius: '5px',
         fontSize: '18px',
         position: 'absolute',
         bottom: '60px',
@@ -88,6 +89,7 @@ const useStyles = makeStyles({
 
 export const HomeLayout = ({ configKey, ...props }) => {
     const [isLoading, setIsLoading] = useState(true);
+    const navigate = useNavigate();
     const { background } = props[configKey] || {};
     const classes = useStyles({ background });
     const configuration = config[configKey];
@@ -107,6 +109,11 @@ export const HomeLayout = ({ configKey, ...props }) => {
         return <Loader configKey="Loader" {...loaderConfig} />;
     }
 
+    const handleGetStarted = (e) => {
+        e.preventDefault();
+        navigate('/login');
+    }
+
     return (
         <div className={classes.root}>
             <div className={classes.spacer} />
@@ -123,7 +130,7 @@ export const HomeLayout = ({ configKey, ...props }) => {
             <div className={classes.spacer} />
             <div className={classes.buttonComponent}>
                 {configuration.startButton && (
-                    <Button type='button' className={classes.button}>Get Started</Button>
+                    <Button type='button' className={classes.button} onClick={handleGetStarted}>Get Started</Button>
                 )}
             </div>
             {configuration.version && (
