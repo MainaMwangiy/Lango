@@ -78,27 +78,26 @@ const useStyles = makeStyles({
 export const Loader = ({ configKey, ...props }) => {
     const { background } = props[configKey] || {};
     const classes = useStyles({ background });
-    const configuration = props[configKey];
-    if (!configuration) return null;
+    if (!props) return null;
     return (
         <div className={classes.root}>
             <div className={classes.spacer} />
             <div className={classes.content}>
-                <img src={configuration.logo} alt="Logo" className={classes.logoImage} />
+                <img src={props.logo} alt="Logo" className={classes.logoImage} />
                 <Typography variant="h5" className={classes.logoName}>
-                    {configuration.logoName}
+                    {props.logoName}
                 </Typography>
                 <Typography className={classes.loaderText}>
-                    {configuration.loaderText}
+                    {props.loaderText}
                 </Typography>
             </div>
-            {configuration.startButton && (
+            {props.startButton && (
                 <div className={classes.buttonComponent}>
                     <Button type='button' className={classes.button}>Get Started</Button>
                 </div>
             )}
-            {configuration.version && (
-                <Typography className={classes.version}>Version {configuration.version}</Typography>
+            {props.version && (
+                <Typography className={classes.version}>Version {props.version}</Typography>
             )}
             <div className={classes.spacer} />
         </div>

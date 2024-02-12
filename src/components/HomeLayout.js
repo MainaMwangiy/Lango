@@ -91,6 +91,7 @@ export const HomeLayout = ({ configKey, ...props }) => {
     const { background } = props[configKey] || {};
     const classes = useStyles({ background });
     const configuration = config[configKey];
+    const loaderConfig = config['Loader'];
     let version = '';
 
     useEffect(() => {
@@ -103,7 +104,7 @@ export const HomeLayout = ({ configKey, ...props }) => {
 
     if (!configuration) return null;
     if (isLoading) {
-        return <Loader configKey="Loader" {...props.Loader} />;
+        return <Loader configKey="Loader" {...loaderConfig} />;
     }
 
     return (
