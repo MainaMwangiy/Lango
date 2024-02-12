@@ -1,7 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core';
 import theme from '../theme';
-import config from './config';
 import { Button, Typography } from '@mui/material';
 
 
