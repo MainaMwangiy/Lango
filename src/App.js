@@ -4,6 +4,7 @@ import './App.css';
 import { HomeLayout } from './components/HomeLayout';
 import config from './components/config';
 import { AuthLayout } from './components/AuthLayout';
+import { MainLayout } from './components/MainLayout';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomeLayout configKey="Home" {...config} />} />
         <Route path="/Login" element={<AuthLayout />} />
+        <Route path="/Main" element={<MainLayout />} />
       </Routes>
     </BrowserRouter>
   );

@@ -111,7 +111,7 @@ export const HomeLayout = ({ configKey, ...props }) => {
 
     const handleGetStarted = (e) => {
         e.preventDefault();
-        navigate('/login');
+        navigate('/Login');
     }
 
     return (
