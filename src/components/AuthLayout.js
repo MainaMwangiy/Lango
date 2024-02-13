@@ -5,6 +5,7 @@ import { Button, TextField } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import theme from '../theme';
+import { useNavigate } from 'react-router';
 
 const useStyles = makeStyles({
     root: {
@@ -78,6 +79,12 @@ const useStyles = makeStyles({
 
 export const AuthLayout = () => {
     const classes = useStyles();
+    const navigate = useNavigate();
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        navigate('/Main');
+    }
     return (
         <div className={classes.root}>
             <div className={classes.header}></div>
@@ -86,7 +93,7 @@ export const AuthLayout = () => {
             <form className={classes.form}>
                 <TextField label="Email" variant="outlined" />
                 <TextField label="Password" type="password" variant="outlined" />
-                <Button className={classes.loginButton}>Login</Button>
+                <Button className={classes.loginButton} onClick={handleSubmit}>Login</Button>
                 <Button className={classes.googleButton}>
                     <GoogleIcon />  Sign in with Google
                 </Button>

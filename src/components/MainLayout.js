@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Header } from './Header';
-import { Box, Button, Slide, Typography } from '@mui/material';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { Box, Button, Typography } from '@mui/material';
 import CommonCard from '../common/Card';
 import apartments from "../assets/apartments.svg";
 import vehicles from "../assets/vehicles.svg";
 import { makeStyles } from '@material-ui/core';
+import { styled } from '@mui/material/styles';
 
 const useStyles = makeStyles({
     welcomeText: {
@@ -27,13 +27,25 @@ const useStyles = makeStyles({
         color: "#234F68",
         fontSize: 20,
         marginBottom: "10px"
-    }
+    },
+    slideTrack: {
+        position: 'relative',
+        width: '100%',
+        height: '50px',
+        borderRadius: '25px',
+        backgroundColor: '#F5F4F8',
+        margin: '20px 0'
+    },
 });
 
 export const MainLayout = () => {
     const classes = useStyles();
     const [anchorElUser, setAnchorElUser] = useState(null);
-    const [openGate, setOpenGate] = useState(false);
+    const [slideRight, setSlideRight] = useState(false);
+
+    const handleSlide = () => {
+        setSlideRight(true);
+    };
 
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);
@@ -43,9 +55,6 @@ export const MainLayout = () => {
         setAnchorElUser(null);
     };
 
-    const handleSlide = () => {
-        setOpenGate(true);
-    };
     const vehicleDetails = {
         image: vehicles,
         alt: '2022 Lamborghini Urus',
@@ -59,7 +68,27 @@ export const MainLayout = () => {
         title: 'Sky Dandelions Apartments',
         description: 'Jakarta, Indonesia',
     };
-
+    const SliderButton = styled(Button)({
+        borderRadius: '25px',
+        backgroundColor: '#4CAF50',
+        color: 'white',
+        position: 'absolute',
+        height: '50px',
+        width: "100px !important",
+        top: '50%',
+        transform: 'translateY(-50%)',
+        transition: 'transform 0.3s ease-in-out',
+        '&:hover': {
+            backgroundColor: '#43A047',
+        },
+        '& .MuiButton-endIcon': {
+            position: 'absolute',
+            right: 2,
+        },
+        right: 0,
+        zIndex: 1,
+        textTransform: "none"
+    });
     return (
         <Box sx={{ flexGrow: 1 }}>
             <Header
@@ -80,22 +109,21 @@ export const MainLayout = () => {
                 <Typography className={classes.slideMessage}>
                     Please slide button to the right to request to open Gate.
                 </Typography>
-                <Slide
-                    direction="left"
-                    in={!openGate}
-                    mountOnEnter
-                    unmountOnExit
-                    container={document.body}
-                >
-                    <Button
+                <div className={classes.slideTrack}>
+                    <SliderButton
                         variant="contained"
-                        endIcon={<ArrowForwardIosIcon />}
-                        sx={{ borderRadius: '30px' }}
                         onClick={handleSlide}
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            left: slideRight ? 'auto' : '0',
+                            right: slideRight ? '0' : 'auto',
+                        }}
                     >
                         Slide
-                    </Button>
-                </Slide>
+                    </SliderButton>
+                </div>
             </Box>
         </Box>
     );
