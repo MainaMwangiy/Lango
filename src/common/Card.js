@@ -1,23 +1,58 @@
 import React from 'react';
 import { Card, CardMedia, CardContent, Typography, Box } from '@mui/material';
+import { makeStyles } from '@material-ui/core';
+
+const useStyles = makeStyles({
+    card: {
+        display: 'flex  !important',
+        marginTop: "30px !important",
+        marginBottom: "30px !important",
+        borderRadius: "25px  !important",
+        background: "#F5F4F8  !important",
+        height: 200
+    },
+    cardMedia: {
+        width: "200px !important",
+        margin: "5px !important",
+        borderRadius: "25px  !important"
+    },
+    cardDetails: {
+        display: 'flex  !important',
+        flexDirection: 'column  !important'
+    },
+    detailsTitle: {
+        fontSize: "14px !important",
+        color: "#252B5C !important",
+        fontWeight: "bold !important"
+    },
+    detailsDescription: {
+        fontSize: "12px !important",
+        color: "#252B5C !important"
+    }
+});
 
 const CommonCard = ({ details }) => {
+    const classes = useStyles();
     return (
-        <Card sx={{ display: 'flex', mb: 3, borderRadius: "25px", background: "#F5F4F8", height: 200 }}>
+        <Card className={classes.card}>
             <CardMedia
                 component="img"
-                sx={{ width: 160, m: 1, borderRadius: "25px" }}
+                className={classes.cardMedia}
                 image={details.image}
                 alt={details.alt}
             />
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Box className={classes.cardDetails}>
                 <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
+                    <Typography className={classes.detailsTitle}>
                         {details.title}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        {details.description}
-                    </Typography>
+                    {details.description.map((item, key) => {
+                        return (
+                            <Typography key={key} className={classes.detailsDescription}>
+                                {`${item}`}
+                            </Typography>
+                        )
+                    })}
                 </CardContent>
             </Box>
         </Card>

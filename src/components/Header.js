@@ -8,9 +8,9 @@ import theme from '../theme';
 
 const useStyles = makeStyles({
     appBar: {
-        backgroundColor: 'white',
-        boxShadow: 'none',
-        marginTop: "10px"
+        backgroundColor: 'white !important',
+        boxShadow: 'none !important',
+        marginTop: "10px !important"
     },
     toolbar: {
         display: "flex  !important",
@@ -18,10 +18,10 @@ const useStyles = makeStyles({
     },
     title: {
         flexGrow: 1,
-        color: 'black'
+        color: 'black !important'
     },
     notificationButton: {
-        marginRight: theme.spacing(2),
+        marginRight: "2px !important",
         border: `2px solid ${theme.colors.secondary}  !important`
     },
     avatarButton: {
@@ -33,20 +33,21 @@ const useStyles = makeStyles({
     locationContainer: {
         justifyContent: "flex-start  !important",
         textTransform: "none  !important",
-        border: "1px solid #ECEDF3",
+        border: "1px solid #ECEDF3 !important",
         color: "#234F68  !important",
-        padding: "10px  !important",
         borderRadius: "50px  !important"
     },
     location: {
-        height: "30px",
-        marginRight: "10px",
-        padding: "10px"
+        height: "20px !important",
+        marginRight: "10px !important",
+        padding: "10px !important"
+    },
+    locationText: {
+        fontSize: "14px !important"
     },
     profileSection: {
         justifyContent: "flex-end  !important",
-        flexGrow: 0,
-        display: 'flex'
+        display: 'flex !important'
     },
     menu: {
         display: { xs: 'block', md: 'none' }
@@ -63,11 +64,13 @@ export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
                 <Toolbar disableGutters className={classes.toolbar}>
                     <Button component="div" className={classes.locationContainer}>
                         <img alt="Map" src={map} className={classes.location} />
-                        <Typography noWrap>{`Kahawa, Nairobi`}</Typography>
+                        <Typography className={classes.locationText}>{`Kahawa, Nairobi`}</Typography>
                     </Button>
-                    <Box className={classes.profileSection}>
+                    <Box sx={{ flexGrow: 0 }}>
                         <Tooltip title="Notifications">
-                            <IconButton className={classes.notificationButton}>
+                            <IconButton className={classes.notificationButton} size="large"
+                                aria-label="show 17 new notifications"
+                                color="inherit">
                                 <Badge badgeContent={4} color="secondary">
                                     <NotificationsIcon />
                                 </Badge>
@@ -79,6 +82,7 @@ export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
                             </IconButton>
                         </Tooltip>
                         <Menu
+                            sx={{ mt: '45px' }}
                             className={classes.menu}
                             id="menu-appbar"
                             anchorEl={anchorElUser}

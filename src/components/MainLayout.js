@@ -9,32 +9,32 @@ import { styled } from '@mui/material/styles';
 
 const useStyles = makeStyles({
     welcomeText: {
-        color: "#252B5C",
-        fontSize: 25,
-        marginBottom: "10px"
+        color: "#252B5C !important",
+        fontSize: "25px  !important",
+        marginBottom: "10px !important"
     },
     openText: {
-        color: "#252B5C",
-        fontSize: 25,
-        marginBottom: "10px"
+        color: "#252B5C  !important",
+        fontSize: "25px !important",
+        marginBottom: "10px  !important"
     },
     slideMessage: {
-        color: "#252B5C",
-        fontSize: 25,
-        marginBottom: "10px"
+        color: "#252B5C !important",
+        fontSize: "20px !important",
+        marginBottom: "10px !important"
     },
     user: {
-        color: "#234F68",
-        fontSize: 20,
-        marginBottom: "10px"
+        color: "#234F68 !important",
+        fontSize: "20px !important",
+        marginBottom: "10px !important"
     },
     slideTrack: {
-        position: 'relative',
-        width: '100%',
-        height: '50px',
-        borderRadius: '25px',
-        backgroundColor: '#F5F4F8',
-        margin: '20px 0'
+        position: 'relative !important',
+        width: '100% !important',
+        height: '50px !important',
+        borderRadius: '25px !important',
+        backgroundColor: '#F5F4F8 !important',
+        margin: '20px 0 !important'
     },
 });
 
@@ -58,15 +58,15 @@ export const MainLayout = () => {
     const vehicleDetails = {
         image: vehicles,
         alt: '2022 Lamborghini Urus',
-        title: '2022 Lamborghini Urus',
-        description: 'KDC 569G - Automatic - 7500cc - Blue',
+        title: 'Lamborghini Urus',
+        description: ['KDC 569G', ' Automatic', '7500cc ', 'Blue']
     };
 
     const apartmentDetails = {
         image: apartments,
         alt: 'Sky Dandelions Apartments',
         title: 'Sky Dandelions Apartments',
-        description: 'Jakarta, Indonesia',
+        description: ['Kahawa, Nairobi']
     };
     const SliderButton = styled(Button)({
         borderRadius: '25px',
@@ -98,16 +98,16 @@ export const MainLayout = () => {
             />
             <Box sx={{ p: 2 }}>
                 <Typography className={classes.welcomeText}>
-                    Hey, <span className={classes.user}>Maina</span>
+                    {` Hey,`} <span className={classes.user}>{`Maina`}</span>
                 </Typography>
                 <Typography className={classes.openText}>
-                    Request to open Gate
+                    {` Request Gate to be opened`}
                 </Typography>
                 <CommonCard details={apartmentDetails} />
                 <CommonCard details={vehicleDetails} />
 
                 <Typography className={classes.slideMessage}>
-                    Please slide button to the right to request to open Gate.
+                    {`  Please slide button to the right to request the gate to be opened.`}
                 </Typography>
                 <div className={classes.slideTrack}>
                     <SliderButton
@@ -121,7 +121,7 @@ export const MainLayout = () => {
                             right: slideRight ? '0' : 'auto',
                         }}
                     >
-                        Slide
+                        {`Slide`}
                     </SliderButton>
                 </div>
             </Box>
