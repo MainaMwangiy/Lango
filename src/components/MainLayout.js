@@ -1,0 +1,130 @@
+import React, { useState } from 'react';
+import { Header } from './Header';
+import { Box, Button, Typography } from '@mui/material';
+import CommonCard from '../common/Card';
+import apartments from "../assets/apartments.svg";
+import vehicles from "../assets/vehicles.svg";
+import { makeStyles } from '@material-ui/core';
+import { styled } from '@mui/material/styles';
+
+const useStyles = makeStyles({
+    welcomeText: {
+        color: "#252B5C !important",
+        fontSize: "25px  !important",
+        marginBottom: "10px !important"
+    },
+    openText: {
+        color: "#252B5C  !important",
+        fontSize: "25px !important",
+        marginBottom: "10px  !important"
+    },
+    slideMessage: {
+        color: "#252B5C !important",
+        fontSize: "20px !important",
+        marginBottom: "10px !important"
+    },
+    user: {
+        color: "#234F68 !important",
+        fontSize: "20px !important",
+        marginBottom: "10px !important"
+    },
+    slideTrack: {
+        position: 'relative !important',
+        width: '100% !important',
+        height: '50px !important',
+        borderRadius: '25px !important',
+        backgroundColor: '#F5F4F8 !important',
+        margin: '20px 0 !important'
+    },
+});
+
+export const MainLayout = () => {
+    const classes = useStyles();
+    const [anchorElUser, setAnchorElUser] = useState(null);
+    const [slideRight, setSlideRight] = useState(false);
+
+    const handleSlide = () => {
+        setSlideRight(true);
+    };
+
+    const handleOpenUserMenu = (event) => {
+        setAnchorElUser(event.currentTarget);
+    };
+
+    const handleCloseUserMenu = () => {
+        setAnchorElUser(null);
+    };
+
+    const vehicleDetails = {
+        image: vehicles,
+        alt: '2022 Lamborghini Urus',
+        title: 'Lamborghini Urus',
+        description: ['KDC 569G', ' Automatic', '7500cc ', 'Blue']
+    };
+
+    const apartmentDetails = {
+        image: apartments,
+        alt: 'Sky Dandelions Apartments',
+        title: 'Sky Dandelions Apartments',
+        description: ['Kahawa, Nairobi']
+    };
+    const SliderButton = styled(Button)({
+        borderRadius: '25px',
+        backgroundColor: '#4CAF50',
+        color: 'white',
+        position: 'absolute',
+        height: '50px',
+        width: "100px !important",
+        top: '50%',
+        transform: 'translateY(-50%)',
+        transition: 'transform 0.3s ease-in-out',
+        '&:hover': {
+            backgroundColor: '#43A047',
+        },
+        '& .MuiButton-endIcon': {
+            position: 'absolute',
+            right: 2,
+        },
+        right: 0,
+        zIndex: 1,
+        textTransform: "none"
+    });
+    return (
+        <Box sx={{ flexGrow: 1 }}>
+            <Header
+                onOpenUserMenu={handleOpenUserMenu}
+                anchorElUser={anchorElUser}
+                onCloseUserMenu={handleCloseUserMenu}
+            />
+            <Box sx={{ p: 2 }}>
+                <Typography className={classes.welcomeText}>
+                    {` Hey,`} <span className={classes.user}>{`Maina`}</span>
+                </Typography>
+                <Typography className={classes.openText}>
+                    {` Request Gate to be opened`}
+                </Typography>
+                <CommonCard details={apartmentDetails} />
+                <CommonCard details={vehicleDetails} />
+
+                <Typography className={classes.slideMessage}>
+                    {`  Please slide button to the right to request the gate to be opened.`}
+                </Typography>
+                <div className={classes.slideTrack}>
+                    <SliderButton
+                        variant="contained"
+                        onClick={handleSlide}
+                        sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            left: slideRight ? 'auto' : '0',
+                            right: slideRight ? '0' : 'auto',
+                        }}
+                    >
+                        {`Slide`}
+                    </SliderButton>
+                </div>
+            </Box>
+        </Box>
+    );
+}
