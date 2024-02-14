@@ -3,13 +3,16 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
 import { HomeLayout } from './components/HomeLayout';
 import config from './components/config';
+import { AuthLayout } from './components/AuthLayout';
+import { MainLayout } from './components/MainLayout';
 
 function App() {
-  console.log("config", config)
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomeLayout configKey="Home" {...config} />} />
+        <Route path="/Login" element={<AuthLayout />} />
+        <Route path="/Main" element={<MainLayout />} />
       </Routes>
     </BrowserRouter>
   );
