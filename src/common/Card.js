@@ -38,21 +38,17 @@ const CommonCard = ({ details }) => {
             <CardMedia
                 component="img"
                 className={classes.cardMedia}
-                image={details.image}
-                alt={details.alt}
+                image={details?.image_url || ''}
+                alt={details?.name || ''}
             />
             <Box className={classes.cardDetails}>
                 <CardContent>
                     <Typography className={classes.detailsTitle}>
-                        {details.title}
+                        {details?.name || ''}
                     </Typography>
-                    {details.description.map((item, key) => {
-                        return (
-                            <Typography key={key} className={classes.detailsDescription}>
-                                {`${item}`}
-                            </Typography>
-                        )
-                    })}
+                    <Typography className={classes.detailsDescription}>
+                        {`${details?.description || ''}`}
+                    </Typography>
                 </CardContent>
             </Box>
         </Card>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import headerImage from '../assets/loginHeader.svg';
 import { makeStyles } from '@material-ui/core';
 import { Button, TextField } from '@mui/material';
@@ -6,6 +6,8 @@ import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import theme from '../theme';
 import { useNavigate } from 'react-router';
+import Swal from 'sweetalert2';
+import axios from 'axios';
 
 const useStyles = makeStyles({
     root: {
@@ -76,24 +78,64 @@ const useStyles = makeStyles({
         alignContent: "center"
     }
 });
+const initialValues = Object.freeze({
+    email: "",
+    password: "",
+});
+
 
 export const AuthLayout = () => {
     const classes = useStyles();
     const navigate = useNavigate();
+    const [formData, setFormData] = useState(initialValues);
 
-    const handleSubmit = (e) => {
+    const onChange = (event) => {
+        const { name, value } = event.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+    const login = async (e) => {
         e.preventDefault();
-        navigate('/Main');
-    }
+        try {
+            const response = await axios.post(
+                "http://localhost:5000/auth/login",
+                formData,
+                {
+                    headers: { "Content-Type": "application/json" },
+                }
+            );
+            if (response.data.success) {
+                Swal.fire({
+                    title: "Success",
+                    text: `${formData.email} Logged In Successfully`,
+                    icon: "success",
+                });
+                localStorage.setItem("token", response.data.token);
+                navigate("/Main");
+            } else {
+                Swal.fire({
+                    title: "Error",
+                    icon: "error",
+                    text: "Login Failed",
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                title: "Error",
+                icon: "error",
+                text: "Login Failed",
+            });
+        }
+    };
     return (
         <div className={classes.root}>
             <div className={classes.header}></div>
             <div className={classes.signInText}>Lets <span className={classes.signInInner}>Sign In</span></div>
             <div className={classes.signInMainText}>Please login into your account</div>
-            <form className={classes.form}>
-                <TextField label="Email" variant="outlined" />
-                <TextField label="Password" type="password" variant="outlined" />
-                <Button className={classes.loginButton} onClick={handleSubmit}>Login</Button>
+            <form className={classes.form} onSubmit={login}>
+                <TextField label="Email" variant="outlined" name="email" value={formData.email || ""} onChange={onChange} />
+                <TextField label="Password" type="password" variant="outlined" name="password" value={formData.password || ""} onChange={onChange} />
+                <Button className={classes.loginButton} type="submit">Login</Button>
                 <Button className={classes.googleButton}>
                     <GoogleIcon />  Sign in with Google
                 </Button>
