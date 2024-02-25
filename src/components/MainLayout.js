@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Header } from './Header';
 import { Box, Button, Typography } from '@mui/material';
 import CommonCard from '../common/Card';
 import apartments from "../assets/apartments.svg";
-import vehicles from "../assets/vehicles.svg";
 import { makeStyles } from '@material-ui/core';
 import { styled } from '@mui/material/styles';
+import axios from 'axios';
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router';
 
 const useStyles = makeStyles({
     welcomeText: {
@@ -42,6 +44,8 @@ export const MainLayout = () => {
     const classes = useStyles();
     const [anchorElUser, setAnchorElUser] = useState(null);
     const [slideRight, setSlideRight] = useState(false);
+    const [vehicles, setVehicles] = useState();
+    const navigate = useNavigate();
 
     const handleSlide = () => {
         setSlideRight(true);
@@ -55,16 +59,43 @@ export const MainLayout = () => {
         setAnchorElUser(null);
     };
 
-    const vehicleDetails = {
-        image: vehicles,
-        alt: '2022 Lamborghini Urus',
-        title: 'Lamborghini Urus',
-        description: ['KDC 569G', ' Automatic', '7500cc ', 'Blue']
-    };
+
+
+    useEffect(() => {
+        const getVehicles = async () => {
+            const id = localStorage.getItem("id");
+            try {
+                const response = await axios.post(
+                    `http://localhost:5000/vehicles/list/${id}`,
+                    {
+                        headers: { "Content-Type": "application/json" },
+                    }
+                );
+                setVehicles(response?.data?.data[0])
+                if (response.data.success) {
+                    navigate("/Main");
+                } else {
+                    Swal.fire({
+                        title: "Error",
+                        icon: "error",
+                        text: "Login Failed",
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    title: "Error",
+                    icon: "error",
+                    text: "Login Failed",
+                });
+            }
+        }
+        getVehicles();
+    }, [navigate])
+
 
     const apartmentDetails = {
-        image: apartments,
-        alt: 'Sky Dandelions Apartments',
+        image_url: apartments,
+        name: 'Sky Dandelions Apartments',
         title: 'Sky Dandelions Apartments',
         description: ['Kahawa, Nairobi']
     };
@@ -104,7 +135,7 @@ export const MainLayout = () => {
                     {` Request Gate to be opened`}
                 </Typography>
                 <CommonCard details={apartmentDetails} />
-                <CommonCard details={vehicleDetails} />
+                <CommonCard details={vehicles} />
 
                 <Typography className={classes.slideMessage}>
                     {`  Please slide button to the right to request the gate to be opened.`}
@@ -124,7 +155,7 @@ export const MainLayout = () => {
                         {`Slide`}
                     </SliderButton>
                 </div>
-            </Box>
-        </Box>
+            </Box >
+        </Box >
     );
 }

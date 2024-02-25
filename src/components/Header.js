@@ -5,6 +5,7 @@ import { makeStyles } from '@material-ui/core';
 import profile from "../assets/profile.svg";
 import map from "../assets/map.svg";
 import theme from '../theme';
+import { useNavigate } from 'react-router';
 
 const useStyles = makeStyles({
     appBar: {
@@ -58,6 +59,20 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
     const classes = useStyles();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        navigate('/login');
+    };
+
+    const handleMenuItemClick = (setting) => {
+        if (setting === 'Logout') {
+            handleLogout();
+        } else {
+            onCloseUserMenu();
+        }
+    };
     return (
         <AppBar position="static" className={classes.appBar} color="default">
             <Container maxWidth="xl">
@@ -99,7 +114,7 @@ export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
                             onClose={onCloseUserMenu}
                         >
                             {settings.map((setting) => (
-                                <MenuItem key={setting} onClick={onCloseUserMenu} className={classes.menuItem}>
+                                <MenuItem key={setting} onClick={() => handleMenuItemClick(setting)} className={classes.menuItem}>
                                     <Typography textAlign="center">{setting}</Typography>
                                 </MenuItem>
                             ))}
