@@ -111,6 +111,7 @@ export const AuthLayout = () => {
                     icon: "success",
                 });
                 localStorage.setItem("token", response.data.token);
+                localStorage.setItem("id", response.data.id);
                 navigate("/Main");
             } else {
                 Swal.fire({

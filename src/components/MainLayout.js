@@ -63,9 +63,11 @@ export const MainLayout = () => {
 
     useEffect(() => {
         const getVehicles = async () => {
+            const id = localStorage.getItem("id");
+            console.log("id", id)
             try {
                 const response = await axios.post(
-                    "http://localhost:5000/vehicles/list",
+                    `http://localhost:5000/vehicles/list/${id}`,
                     {
                         headers: { "Content-Type": "application/json" },
                     }
@@ -93,8 +95,8 @@ export const MainLayout = () => {
 
 
     const apartmentDetails = {
-        image: apartments,
-        alt: 'Sky Dandelions Apartments',
+        image_url: apartments,
+        name: 'Sky Dandelions Apartments',
         title: 'Sky Dandelions Apartments',
         description: ['Kahawa, Nairobi']
     };
