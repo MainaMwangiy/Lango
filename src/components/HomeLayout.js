@@ -10,7 +10,7 @@ const useStyles = makeStyles({
     root: (props) => ({
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         alignItems: 'center',
         backgroundColor: theme.colors.primary,
         padding: '20px',
@@ -22,7 +22,9 @@ const useStyles = makeStyles({
         backgroundPosition: 'center'
     }),
     spacer: {
-        flexGrow: 1
+        flexGrow: 0,
+        flexShrink: 0,
+        minHeight: '20px'
     },
     content: {
         display: 'flex',
@@ -31,8 +33,8 @@ const useStyles = makeStyles({
         alignItems: 'center',
         width: '100%',
         maxWidth: '600px',
-        flexGrow: 0,
-        flexShrink: 0,
+        flexGrow: 1,
+        flexShrink: 1
     },
     loader: {
         display: 'flex',
@@ -59,10 +61,9 @@ const useStyles = makeStyles({
         padding: '10px 20px',
         borderRadius: '5px',
         fontSize: '18px',
-        position: 'absolute',
-        bottom: '60px',
         width: '50%',
-        textAlign: 'center'
+        textAlign: 'center',
+        alignSelf: 'center'
     },
     button: {
         color: '#ffffff !important',
@@ -71,8 +72,6 @@ const useStyles = makeStyles({
         textAlign: 'center'
     },
     version: {
-        position: 'absolute',
-        bottom: '10px',
         width: '100%',
         textAlign: 'center',
         color: theme.colors.text,
@@ -83,7 +82,22 @@ const useStyles = makeStyles({
         justifyContent: 'center',
         alignItems: 'center',
         color: theme.colors.text,
-    }
+    },
+    '@media (max-width: 600px)': {
+        root: {
+            padding: '10px'
+        },
+        buttonComponent: {
+            width: '80%',
+            padding: '8px 16px'
+        },
+        version: {
+            fontSize: '14px'
+        },
+        logoImage: {
+            maxWidth: '200px'
+        }
+    },
 });
 
 
