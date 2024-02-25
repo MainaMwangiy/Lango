@@ -155,7 +155,7 @@ export const MainLayout = () => {
                         {`Slide`}
                     </SliderButton>
                 </div>
-            </Box>
-        </Box>
+            </Box >
+        </Box >
     );
 }
