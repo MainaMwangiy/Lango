@@ -83,6 +83,7 @@ const initialValues = Object.freeze({
     password: "",
 });
 
+const url = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_BACKEND_URL : process.env.REACT_APP_DEV_BACKEND_URL
 
 export const AuthLayout = () => {
     const classes = useStyles();
@@ -98,7 +99,7 @@ export const AuthLayout = () => {
         e.preventDefault();
         try {
             const response = await axios.post(
-                "http://localhost:5000/auth/login",
+                `${url}/auth/login`,
                 formData,
                 {
                     headers: { "Content-Type": "application/json" },
@@ -111,6 +112,7 @@ export const AuthLayout = () => {
                     icon: "success",
                 });
                 localStorage.setItem("token", response.data.token);
+                localStorage.setItem("id", response.data.id);
                 navigate("/Main");
             } else {
                 Swal.fire({

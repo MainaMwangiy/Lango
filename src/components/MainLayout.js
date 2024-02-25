@@ -8,7 +8,7 @@ import { styled } from '@mui/material/styles';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router';
-
+const url = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_BACKEND_URL : process.env.REACT_APP_DEV_BACKEND_URL
 const useStyles = makeStyles({
     welcomeText: {
         color: "#252B5C !important",
@@ -63,9 +63,10 @@ export const MainLayout = () => {
 
     useEffect(() => {
         const getVehicles = async () => {
+            const id = localStorage.getItem("id");
             try {
                 const response = await axios.post(
-                    "http://localhost:5000/vehicles/list",
+                    `${url}/vehicles/list/${id}`,
                     {
                         headers: { "Content-Type": "application/json" },
                     }
@@ -93,8 +94,8 @@ export const MainLayout = () => {
 
 
     const apartmentDetails = {
-        image: apartments,
-        alt: 'Sky Dandelions Apartments',
+        image_url: apartments,
+        name: 'Sky Dandelions Apartments',
         title: 'Sky Dandelions Apartments',
         description: ['Kahawa, Nairobi']
     };
@@ -154,7 +155,7 @@ export const MainLayout = () => {
                         {`Slide`}
                     </SliderButton>
                 </div>
-            </Box>
-        </Box>
+            </Box >
+        </Box >
     );
 }
