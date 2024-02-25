@@ -101,14 +101,13 @@ const useStyles = makeStyles({
 });
 
 
-export const HomeLayout = ({ configKey, ...props }) => {
+export const HomeLayout = ({ configKey, version, ...props }) => {
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
     const { background } = props[configKey] || {};
     const classes = useStyles({ background });
     const configuration = config[configKey];
     const loaderConfig = config['Loader'];
-    let version = '';
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -147,14 +146,12 @@ export const HomeLayout = ({ configKey, ...props }) => {
                     <Button type='button' className={classes.button} onClick={handleGetStarted}>Get Started</Button>
                 )}
             </div>
-            {configuration.version && (
-                <div className={classes.version}>
-                    <div className={classes.versionContent}>
-                        <Typography>{'Lango'}</Typography>
-                        <Typography>{`${version || 'v.1.0'}`}</Typography>
-                    </div>
+            <div className={classes.version}>
+                <div className={classes.versionContent}>
+                    <Typography>{`${version?.name || 'Lango'}`}</Typography>
+                    <Typography>{`${version?.tag_name || 'v.1.0'}`}</Typography>
                 </div>
-            )}
+            </div>
             <div className={classes.spacer} />
         </div>
     );
