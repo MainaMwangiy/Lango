@@ -64,7 +64,6 @@ export const MainLayout = () => {
     useEffect(() => {
         const getVehicles = async () => {
             const id = localStorage.getItem("id");
-            console.log("id", id)
             try {
                 const response = await axios.post(
                     `http://localhost:5000/vehicles/list/${id}`,
