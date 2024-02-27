@@ -45,6 +45,7 @@ export const MainLayout = () => {
     const [anchorElUser, setAnchorElUser] = useState(null);
     const [slideRight, setSlideRight] = useState(false);
     const [vehicles, setVehicles] = useState();
+    const [user, setUser] = useState();
     const navigate = useNavigate();
 
     const handleSlide = () => {
@@ -58,8 +59,6 @@ export const MainLayout = () => {
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
-
-
 
     useEffect(() => {
         const getVehicles = async () => {
@@ -89,6 +88,34 @@ export const MainLayout = () => {
                 });
             }
         }
+        const getUser = async () => {
+            const id = localStorage.getItem("id");
+            try {
+                const response = await axios.post(
+                    `${url}/auth/users/${id}`,
+                    {
+                        headers: { "Content-Type": "application/json" },
+                    }
+                );
+                setUser(response?.data?.data[0])
+                if (response.data.success) {
+                    navigate("/Main");
+                } else {
+                    Swal.fire({
+                        title: "Error",
+                        icon: "error",
+                        text: "User Loading Failed",
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    title: "Error",
+                    icon: "error",
+                    text: "User Loading Failed",
+                });
+            }
+        }
+        getUser();
         getVehicles();
     }, [navigate])
 
@@ -129,7 +156,7 @@ export const MainLayout = () => {
             />
             <Box sx={{ p: 2 }}>
                 <Typography className={classes.welcomeText}>
-                    {` Hey,`} <span className={classes.user}>{`Maina`}</span>
+                    {` Hey,`} <span className={classes.user}>{`${user?.name}`}</span>
                 </Typography>
                 <Typography className={classes.openText}>
                     {` Request Gate to be opened`}
