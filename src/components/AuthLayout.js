@@ -145,7 +145,8 @@ export const AuthLayout = () => {
                     <FacebookIcon />  Sign in with Facebook
                 </Button>
             </form>
-            <div className={classes.authChange}>Don't have an account?  <span className={classes.signInInner}>Register</span></div>
+            {/* Commenting out this Registration section as at the moment I dont need it. user details created from the dashboard */}
+            {/* <div className={classes.authChange}>Don't have an account?  <span className={classes.signInInner}>Register</span></div> */}
         </div>
     );
 };
