@@ -8,6 +8,7 @@ import { styled } from '@mui/material/styles';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router';
+import { LocationLayout } from './LocationLayout';
 const url = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_BACKEND_URL : process.env.REACT_APP_DEV_BACKEND_URL
 const useStyles = makeStyles({
     welcomeText: {
@@ -182,6 +183,7 @@ export const MainLayout = () => {
                         {`Slide`}
                     </SliderButton>
                 </div>
+                {slideRight && <LocationLayout />}
             </Box >
         </Box >
     );
