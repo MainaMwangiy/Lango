@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import headerImage from '../assets/loginHeader.svg';
 import { makeStyles } from '@material-ui/core';
-import { Button, TextField } from '@mui/material';
+import { Button, IconButton, InputAdornment, TextField } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import theme from '../theme';
 import { useNavigate } from 'react-router';
 import Swal from 'sweetalert2';
 import axios from 'axios';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 const useStyles = makeStyles({
     root: {
@@ -89,6 +91,11 @@ export const AuthLayout = () => {
     const classes = useStyles();
     const navigate = useNavigate();
     const [formData, setFormData] = useState(initialValues);
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleShowHidePassword = () => {
+        setShowPassword(!showPassword);
+    }
 
     const onChange = (event) => {
         const { name, value } = event.target;
@@ -136,7 +143,23 @@ export const AuthLayout = () => {
             <div className={classes.signInMainText}>Please login into your account</div>
             <form className={classes.form} onSubmit={login}>
                 <TextField label="Email" variant="outlined" name="email" value={formData.email || ""} onChange={onChange} />
-                <TextField label="Password" type="password" variant="outlined" name="password" value={formData.password || ""} onChange={onChange} />
+                <TextField
+                    label="Password"
+                    variant="outlined"
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password || ""}
+                    onChange={onChange}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton onClick={handleShowHidePassword}>
+                                    {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                </IconButton>
+                            </InputAdornment>
+                        ),
+                    }}
+                />
                 <Button className={classes.loginButton} type="submit">Login</Button>
                 <Button className={classes.googleButton}>
                     <GoogleIcon />  Sign in with Google
