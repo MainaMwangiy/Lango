@@ -148,8 +148,7 @@ export const HomeLayout = ({ configKey, version, ...props }) => {
             </div>
             <div className={classes.version}>
                 <div className={classes.versionContent}>
-                    <Typography>{`${version?.name || 'Lango'}`}</Typography>
-                    <Typography>{`${version?.tag_name || 'v.1.0'}`}</Typography>
+                    <Typography>{`${version?.name || 'Lango v.1.0'}`}</Typography>
                 </div>
             </div>
             <div className={classes.spacer} />
