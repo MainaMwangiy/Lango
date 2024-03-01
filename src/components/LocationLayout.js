@@ -56,7 +56,7 @@ const useStyles = makeStyles({
     },
     locationText: {
         color: "#252B5C !important",
-        fontSize: "25px  !important"
+        fontSize: "23px  !important"
     }
 });
 
@@ -66,16 +66,15 @@ export const LocationLayout = () => {
         '0 - 50m',
         '50 - 100m',
         '100 - 150m',
-        '150 - 200m',
-        '200 - 250m',
+        '150 - 200m'
     ];
 
     return (
         <Box className={classes.locationCard}>
             <Box className={classes.distanceSelectHeader}>
-                <Typography variant="h6" className={classes.locationText}>Select Location Distance</Typography>
+                <Typography variant="h6" className={classes.locationText}>{"Select Location Distance"}</Typography>
                 <Button variant="contained" color="primary" className={classes.continueButton}>
-                    Continue
+                    {"  Continue"}
                 </Button>
             </Box>
             <Box className={classes.cardsContainer}>
