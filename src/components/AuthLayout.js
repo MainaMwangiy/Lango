@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import headerImage from '../assets/loginHeader.svg';
 import { makeStyles } from '@material-ui/core';
 import { Button, IconButton, InputAdornment, TextField } from '@mui/material';
@@ -81,11 +81,14 @@ const useStyles = makeStyles({
     }
 });
 const initialValues = Object.freeze({
-    email: "",
-    password: "",
+    email: '',
+    password: '',
 });
 
-const url = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_BACKEND_URL : process.env.REACT_APP_DEV_BACKEND_URL
+const url =
+    process.env.NODE_ENV === 'production'
+        ? process.env.REACT_APP_PROD_BACKEND_URL
+        : process.env.REACT_APP_DEV_BACKEND_URL;
 
 export const AuthLayout = () => {
     const classes = useStyles();
@@ -93,9 +96,17 @@ export const AuthLayout = () => {
     const [formData, setFormData] = useState(initialValues);
     const [showPassword, setShowPassword] = useState(false);
 
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const id = localStorage.getItem('id');
+        if (token && id) {
+            navigate('/Main');
+        }
+    }, [navigate]);
+
     const handleShowHidePassword = () => {
         setShowPassword(!showPassword);
-    }
+    };
 
     const onChange = (event) => {
         const { name, value } = event.target;
@@ -105,50 +116,54 @@ export const AuthLayout = () => {
     const login = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(
-                `${url}/auth/login`,
-                formData,
-                {
-                    headers: { "Content-Type": "application/json" },
-                }
-            );
+            const response = await axios.post(`${url}/auth/login`, formData, {
+                headers: { 'Content-Type': 'application/json' },
+            });
             if (response.data.success) {
                 Swal.fire({
-                    title: "Success",
+                    title: 'Success',
                     text: `${formData.email} Logged In Successfully`,
-                    icon: "success",
+                    icon: 'success',
                 });
-                localStorage.setItem("token", response.data.token);
-                localStorage.setItem("id", response.data.id);
-                navigate("/Main");
+                localStorage.setItem('token', response.data.token);
+                localStorage.setItem('id', response.data.id);
+                navigate('/Main');
             } else {
                 Swal.fire({
-                    title: "Error",
-                    icon: "error",
-                    text: "Login Failed",
+                    title: 'Error',
+                    icon: 'error',
+                    text: 'Login Failed',
                 });
             }
         } catch (error) {
             Swal.fire({
-                title: "Error",
-                icon: "error",
-                text: "Login Failed",
+                title: 'Error',
+                icon: 'error',
+                text: 'Login Failed',
             });
         }
     };
     return (
         <div className={classes.root}>
             <div className={classes.header}></div>
-            <div className={classes.signInText}>Lets <span className={classes.signInInner}>Sign In</span></div>
+            <div className={classes.signInText}>
+                Lets <span className={classes.signInInner}>Sign In</span>
+            </div>
             <div className={classes.signInMainText}>Please login into your account</div>
             <form className={classes.form} onSubmit={login}>
-                <TextField label="Email" variant="outlined" name="email" value={formData.email || ""} onChange={onChange} />
+                <TextField
+                    label="Email"
+                    variant="outlined"
+                    name="email"
+                    value={formData.email || ''}
+                    onChange={onChange}
+                />
                 <TextField
                     label="Password"
                     variant="outlined"
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     name="password"
-                    value={formData.password || ""}
+                    value={formData.password || ''}
                     onChange={onChange}
                     InputProps={{
                         endAdornment: (
@@ -160,16 +175,18 @@ export const AuthLayout = () => {
                         ),
                     }}
                 />
-                <Button className={classes.loginButton} type="submit">Login</Button>
+                <Button className={classes.loginButton} type="submit">
+                    Login
+                </Button>
                 <Button className={classes.googleButton}>
-                    <GoogleIcon />  Sign in with Google
+                    <GoogleIcon /> Sign in with Google
                 </Button>
                 <Button className={classes.facebookButton}>
-                    <FacebookIcon />  Sign in with Facebook
+                    <FacebookIcon /> Sign in with Facebook
                 </Button>
             </form>
             {/* Commenting out this Registration section as at the moment I dont need it. user details created from the dashboard */}
-            {/* <div className={classes.authChange}>Don't have an account?  <span className={classes.signInInner}>Register</span></div> */}
+            {/* <div className={classes.authChange}>Don't have an account? <span className={classes.signInInner}>Register</span></div> */}
         </div>
     );
 };
