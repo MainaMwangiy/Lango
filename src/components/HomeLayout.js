@@ -5,6 +5,7 @@ import config from './config';
 import { Button, Typography } from '@mui/material';
 import { Loader } from './Loader';
 import { useNavigate } from 'react-router';
+import homeBackground from '../assets/home.svg';
 
 const useStyles = makeStyles({
     root: (props) => ({
@@ -131,7 +132,7 @@ export const HomeLayout = ({ configKey, version, ...props }) => {
         <div className={classes.root}>
             <div className={classes.spacer} />
             <div className={classes.content}>
-                <img src={configuration.logo} alt="Logo" className={classes.logoImage} />
+                <img src={configuration.logo || homeBackground} alt="Logo" className={classes.logoImage} />
                 <Typography variant="h5" className={classes.logoName}>
                     {configuration.logoName}
                 </Typography>
