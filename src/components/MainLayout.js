@@ -9,7 +9,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router';
 import { LocationLayout } from './LocationLayout';
-const url = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_BACKEND_URL : process.env.REACT_APP_DEV_BACKEND_URL
+const url = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_BACKEND_URL : process.env.REACT_APP_DEV_BACKEND_URL;
 const useStyles = makeStyles({
     welcomeText: {
         color: "#252B5C !important",
@@ -45,9 +45,90 @@ export const MainLayout = () => {
     const classes = useStyles();
     const [anchorElUser, setAnchorElUser] = useState(null);
     const [slideRight, setSlideRight] = useState(false);
-    const [vehicles, setVehicles] = useState();
-    const [user, setUser] = useState();
+    const [vehicles, setVehicles] = useState(null);
+    const [user, setUser] = useState(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        const storedVehicles = localStorage.getItem('vehicles');
+        if (storedUser) {
+            try {
+                setUser(JSON.parse(storedUser));
+            } catch (error) {
+                console.error("Error parsing stored user data:", error);
+            }
+        } else {
+            getUserDetails();
+        }
+
+        if (storedVehicles) {
+            try {
+                setVehicles(JSON.parse(storedVehicles));
+            } catch (error) {
+                console.error("Error parsing stored vehicles data:", error);
+            }
+        } else {
+            getVehicles();
+        }
+    }, []);
+
+    const getUserDetails = async () => {
+        const id = localStorage.getItem("id");
+        try {
+            const response = await axios.post(
+                `${url}/auth/users/${id}`,
+                {},
+                { headers: { "Content-Type": "application/json" } }
+            );
+            if (response.data.success) {
+                const userData = response.data.data[0];
+                localStorage.setItem('user', JSON.stringify(userData));
+                setUser(userData);
+                navigate("/Main");
+            } else {
+                Swal.fire({
+                    title: "Error",
+                    icon: "error",
+                    text: "User Loading Failed",
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                title: "Error",
+                icon: "error",
+                text: "User Loading Failed",
+            });
+        }
+    };
+    const getVehicles = async () => {
+        const id = localStorage.getItem("id");
+        try {
+            const response = await axios.post(
+                `${url}/vehicles/list/${id}`,
+                {},
+                { headers: { "Content-Type": "application/json" } }
+            );
+            if (response.data.success) {
+                const vehiclesData = response.data.data[0];
+                localStorage.setItem('vehicles', JSON.stringify(vehiclesData));
+                setVehicles(vehiclesData);
+                navigate("/Main");
+            } else {
+                Swal.fire({
+                    title: "Error",
+                    icon: "error",
+                    text: "Failed to fetch vehicles",
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                title: "Error",
+                icon: "error",
+                text: "Failed to fetch vehicles",
+            });
+        }
+    };
 
     const handleSlide = () => {
         setSlideRight(true);
@@ -60,66 +141,6 @@ export const MainLayout = () => {
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
-
-    useEffect(() => {
-        const getVehicles = async () => {
-            const id = localStorage.getItem("id");
-            try {
-                const response = await axios.post(
-                    `${url}/vehicles/list/${id}`,
-                    {
-                        headers: { "Content-Type": "application/json" },
-                    }
-                );
-                setVehicles(response?.data?.data[0])
-                if (response.data.success) {
-                    navigate("/Main");
-                } else {
-                    Swal.fire({
-                        title: "Error",
-                        icon: "error",
-                        text: "Login Failed",
-                    });
-                }
-            } catch (error) {
-                Swal.fire({
-                    title: "Error",
-                    icon: "error",
-                    text: "Login Failed",
-                });
-            }
-        }
-        const getUser = async () => {
-            const id = localStorage.getItem("id");
-            try {
-                const response = await axios.post(
-                    `${url}/auth/users/${id}`,
-                    {
-                        headers: { "Content-Type": "application/json" },
-                    }
-                );
-                setUser(response?.data?.data[0])
-                if (response.data.success) {
-                    navigate("/Main");
-                } else {
-                    Swal.fire({
-                        title: "Error",
-                        icon: "error",
-                        text: "User Loading Failed",
-                    });
-                }
-            } catch (error) {
-                Swal.fire({
-                    title: "Error",
-                    icon: "error",
-                    text: "User Loading Failed",
-                });
-            }
-        }
-        getUser();
-        getVehicles();
-    }, [navigate])
-
 
     const apartmentDetails = {
         image_url: apartments,
@@ -157,7 +178,7 @@ export const MainLayout = () => {
             />
             <Box sx={{ p: 2 }}>
                 <Typography className={classes.welcomeText}>
-                    {` Hey,`} <span className={classes.user}>{`${user?.name}`}</span>
+                    {` Hey,`} <span className={classes.user}>{`${user?.name || 'User'}`}</span>
                 </Typography>
                 <Typography className={classes.openText}>
                     {` Request Gate to be opened`}
@@ -166,7 +187,7 @@ export const MainLayout = () => {
                 <CommonCard details={vehicles} />
 
                 <Typography className={classes.slideMessage}>
-                    {`  Please slide button to the right to request the gate to be opened.`}
+                    {` Please slide button to the right to request the gate to be opened.`}
                 </Typography>
                 <div className={classes.slideTrack}>
                     <SliderButton
@@ -184,7 +205,7 @@ export const MainLayout = () => {
                     </SliderButton>
                 </div>
                 {slideRight && <LocationLayout />}
-            </Box >
-        </Box >
+            </Box>
+        </Box>
     );
 }
