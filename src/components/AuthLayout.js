@@ -4,8 +4,9 @@ import { makeStyles } from '@material-ui/core';
 import { Button, IconButton, InputAdornment, TextField } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
+import { GitHub } from '@mui/icons-material';
 import theme from '../theme';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -62,6 +63,14 @@ const useStyles = makeStyles({
             backgroundColor: '#365899 !important',
         },
     },
+    gitHubButton: {
+        backgroundColor: '#24292e !important',
+        padding: '10px 20px !important',
+        color: '#ffffff !important',
+        '&:hover': {
+            backgroundColor: '#24292e !important',
+        },
+    },
     signInText: {
         fontSize: "25px",
         fontFamily: "Lato"
@@ -92,15 +101,43 @@ const url =
 
 export const AuthLayout = () => {
     const classes = useStyles();
+    const location = useLocation();
     const navigate = useNavigate();
     const [formData, setFormData] = useState(initialValues);
     const [showPassword, setShowPassword] = useState(false);
-
+    const [isGitHub, setIsGitHub] = useState(false);
+    const exchangeCodeForToken = async (code) => {
+        try {
+            const response = await axios.get(`http://localhost:3000/api/auth/github/callback?code=${code}`);
+            if (response.data.success) {
+                localStorage.setItem('token', response.data.token);  // Store the token or handle it as you see fit
+                navigate('/Main');  // Redirect to main page or dashboard
+            } else {
+                console.error('Failed to login with GitHub:', response.data.message);
+                navigate('/login', { replace: true });
+            }
+        } catch (error) {
+            console.error('Error during GitHub login:', error);
+            navigate('/login', { replace: true });
+        }
+    };
     useEffect(() => {
         const token = localStorage.getItem('token');
         const id = localStorage.getItem('id');
-        if (token && id) {
-            navigate('/Main');
+        console.log("Current URL Search Part:", window.location.search);
+        const code = new URLSearchParams(window.location.search).get('code');
+        console.log("Extracted Code:", code);
+
+        if (isGitHub) {
+            if (code) {
+                exchangeCodeForToken(code);
+            } else {
+                navigate('/login', { replace: true });
+            }
+        } else {
+            if (token && id) {
+                navigate('/Main');
+            }
         }
     }, [navigate]);
 
@@ -143,6 +180,14 @@ export const AuthLayout = () => {
             });
         }
     };
+    const redirectToGitHub = () => {
+        setIsGitHub(true);
+        const client_id = process.env.REACT_APP_GITHUB_CLIENT_ID || 'Ov23liCshRu01XGKySxK';
+        const redirect_uri = "http://localhost:3000/Main";
+        const scope = "read:user";
+        const authUrl = `https://github.com/login/oauth/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}`;
+        window.location.href = authUrl;
+    }
     return (
         <div className={classes.root}>
             <div className={classes.header}></div>
@@ -181,9 +226,12 @@ export const AuthLayout = () => {
                 <Button className={classes.googleButton}>
                     <GoogleIcon /> Sign in with Google
                 </Button>
-                <Button className={classes.facebookButton}>
-                    <FacebookIcon /> Sign in with Facebook
+                <Button className={classes.facebookButton} onClick={redirectToGitHub}>
+                    <GitHub /> Sign in with GitHub
                 </Button>
+                {/* <Button className={classes.facebookButton}>
+                    <FacebookIcon /> Sign in with Facebook
+                </Button> */}
             </form>
             {/* Commenting out this Registration section as at the moment I dont need it. user details created from the dashboard */}
             {/* <div className={classes.authChange}>Don't have an account? <span className={classes.signInInner}>Register</span></div> */}
