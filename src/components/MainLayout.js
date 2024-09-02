@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Header } from './Header';
 import { Box, Button, Typography } from '@mui/material';
 import CommonCard from '../common/Card';
@@ -9,6 +9,8 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router';
 import { LocationLayout } from './LocationLayout';
+import { useDispatch, useSelector } from 'react-redux';
+import { actions } from '../redux/actions';
 const url = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_BACKEND_URL : process.env.REACT_APP_DEV_BACKEND_URL;
 const useStyles = makeStyles({
     welcomeText: {
@@ -42,38 +44,17 @@ const useStyles = makeStyles({
 });
 
 export const MainLayout = () => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
     const classes = useStyles();
     const [anchorElUser, setAnchorElUser] = useState(null);
     const [slideRight, setSlideRight] = useState(false);
     const [vehicles, setVehicles] = useState(null);
     const [user, setUser] = useState(null);
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        const storedVehicles = localStorage.getItem('vehicles');
-        if (storedUser) {
-            try {
-                setUser(JSON.parse(storedUser));
-            } catch (error) {
-                console.error("Error parsing stored user data:", error);
-            }
-        } else {
-            getUserDetails();
-        }
-
-        if (storedVehicles) {
-            try {
-                setVehicles(JSON.parse(storedVehicles));
-            } catch (error) {
-                console.error("Error parsing stored vehicles data:", error);
-            }
-        } else {
-            getVehicles();
-        }
-    }, []);
-
-    const getUserDetails = async () => {
+    const [chooseLocation, setChooseLocation] = useState(false);
+    const [isLocationCardVisible, setIsLocationCardVisible] = useState(false);
+    const isLocationCard = useSelector(state => state.location.showLocationCards);
+    const getUserDetails = useCallback(async () => {
         const id = localStorage.getItem("id");
         try {
             const response = await axios.post(
@@ -100,8 +81,9 @@ export const MainLayout = () => {
                 text: "User Loading Failed",
             });
         }
-    };
-    const getVehicles = async () => {
+    }, [navigate]);
+
+    const getVehicles = useCallback(async () => {
         const id = localStorage.getItem("id");
         try {
             const response = await axios.post(
@@ -128,10 +110,44 @@ export const MainLayout = () => {
                 text: "Failed to fetch vehicles",
             });
         }
-    };
+    }, [navigate]);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        const storedVehicles = localStorage.getItem('vehicles');
+        if (storedUser) {
+            try {
+                setUser(JSON.parse(storedUser));
+            } catch (error) {
+                console.error("Error parsing stored user data:", error);
+            }
+        } else {
+            getUserDetails();
+        }
+        if (storedVehicles) {
+            try {
+                const jsonVehicles = storedVehicles.length > 0 ? JSON.stringify(storedVehicles) : [];
+                setVehicles(JSON.parse(jsonVehicles));
+            } catch (error) {
+                console.error("Error parsing stored vehicles data:", error);
+            }
+        } else {
+            getVehicles();
+        }
+        setIsLocationCardVisible(isLocationCard && chooseLocation && slideRight);
+    }, [getUserDetails, getVehicles, isLocationCard, chooseLocation, slideRight]); //chooseLocation, slideRight remove if failing
+
 
     const handleSlide = () => {
         setSlideRight(true);
+        setChooseLocation(true);
+        dispatch({ type: actions.ADD_LOCATION_CARDS, payload: true });
+    };
+
+    const handleSweetAlertConfirm = () => {
+        setSlideRight(false);
+        setChooseLocation(false);
+        setIsLocationCardVisible(false);
     };
 
     const handleOpenUserMenu = (event) => {
@@ -169,6 +185,15 @@ export const MainLayout = () => {
         zIndex: 1,
         textTransform: "none"
     });
+
+    const loadLocationCards = () => {
+        if (isLocationCardVisible) {
+            return (
+                <LocationLayout onConfirm={handleSweetAlertConfirm} />
+            );
+        }
+        return null;
+    };
     return (
         <Box sx={{ flexGrow: 1 }}>
             <Header
@@ -204,7 +229,7 @@ export const MainLayout = () => {
                         {`Slide`}
                     </SliderButton>
                 </div>
-                {slideRight && <LocationLayout />}
+                {loadLocationCards()}
             </Box>
         </Box>
     );

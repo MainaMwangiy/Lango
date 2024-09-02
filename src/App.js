@@ -8,6 +8,8 @@ import { MainLayout } from './components/MainLayout';
 import PrivateRoute from './components/ProtectedRoute';
 import version from '../package.json';
 import NewVersionNotification from './NewVersionNotification';
+import store from './redux/store';
+import { Provider } from 'react-redux';
 
 function App() {
   const [isNewVersionAvailable, setIsNewVersionAvailable] = useState(false);
@@ -49,14 +51,16 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
-      {!navigator.onLine && isNewVersionAvailable && <NewVersionNotification onInstall={handleInstall} onCancel={handleCancel} />}
-      <Routes>
-        <Route path="/" element={<HomeLayout configKey="Home" version={versionDetails} {...config} />} />
-        <Route path="/Login" element={<AuthLayout />} />
-        <Route path="/Main" element={<PrivateRoute authenticated={true} component={MainLayout} />} />
-      </Routes>
-    </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
+        {!navigator.onLine && isNewVersionAvailable && <NewVersionNotification onInstall={handleInstall} onCancel={handleCancel} />}
+        <Routes>
+          <Route path="/" element={<HomeLayout configKey="Home" version={versionDetails} {...config} />} />
+          <Route path="/Login" element={<AuthLayout />} />
+          <Route path="/Main" element={<PrivateRoute authenticated={true} component={MainLayout} />} />
+        </Routes>
+      </BrowserRouter>
+    </Provider>
   );
 }
 
