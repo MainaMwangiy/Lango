@@ -54,6 +54,8 @@ export const MainLayout = () => {
     const [chooseLocation, setChooseLocation] = useState(false);
     const [isLocationCardVisible, setIsLocationCardVisible] = useState(false);
     const isLocationCard = useSelector(state => state.location.showLocationCards);
+    const openNotification = useSelector(state => state.location.openNotification);
+
     const getUserDetails = useCallback(async () => {
         const id = localStorage.getItem("id");
         try {
@@ -196,11 +198,13 @@ export const MainLayout = () => {
     };
     return (
         <Box sx={{ flexGrow: 1 }}>
-            <Header
-                onOpenUserMenu={handleOpenUserMenu}
-                anchorElUser={anchorElUser}
-                onCloseUserMenu={handleCloseUserMenu}
-            />
+            {!openNotification &&
+                <Header
+                    onOpenUserMenu={handleOpenUserMenu}
+                    anchorElUser={anchorElUser}
+                    onCloseUserMenu={handleCloseUserMenu}
+                />
+            }
             <Box sx={{ p: 2 }}>
                 <Typography className={classes.welcomeText}>
                     {` Hey,`} <span className={classes.user}>{`${user?.name || 'User'}`}</span>
