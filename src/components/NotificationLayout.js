@@ -8,6 +8,7 @@ import SecurityIcon from '@mui/icons-material/Security';
 import CommentIcon from '@mui/icons-material/Comment';
 import SubscriptionIcon from '@mui/icons-material/Subscriptions';
 import { Avatar, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
+import dayjs from 'dayjs';
 
 const url =
     process.env.NODE_ENV === 'production'
@@ -73,13 +74,13 @@ const NotificationLayout = () => {
             }
             <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
                 {notifications.map((notification) => (
-                    <React.Fragment key={notification.notificationid}>
+                    <React.Fragment key={notification.notification_id}>
                         <ListItem alignItems="flex-start"
                         // sx={{bgcolor: getStatusColor(notification.status)}}
                         >
                             <ListItemAvatar>
                                 <Avatar>
-                                    {getIcon(notification.notificationtype)}
+                                    {getIcon(notification.notification_type)}
                                 </Avatar>
                             </ListItemAvatar>
                             <ListItemText
@@ -95,7 +96,7 @@ const NotificationLayout = () => {
                                             {`Status: ${notification.status.charAt(0).toUpperCase() + notification.status.slice(1)}`}
                                         </Typography>
                                         {" — "}
-                                        {new Date(notification.createdat).toLocaleDateString()}
+                                        {dayjs(notification.created_at).format('DD-MM-YYYY')}
                                     </React.Fragment>
                                 }
                             />
