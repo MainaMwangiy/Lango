@@ -127,6 +127,12 @@ export const AuthLayout = () => {
                 });
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('id', response.data.id);
+                localStorage.setItem('role', response.data.role);
+                if (response.data.role === 'admin') {
+                    localStorage.setItem('adminId', response.data.id);
+                } else {
+                    localStorage.setItem('userId', response.data.id);
+                }
                 navigate('/Main');
             } else {
                 Swal.fire({

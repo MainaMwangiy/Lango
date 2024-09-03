@@ -6,6 +6,8 @@ import profile from "../assets/profile.svg";
 import map from "../assets/map.svg";
 import theme from '../theme';
 import { useNavigate } from 'react-router';
+import { useDispatch } from 'react-redux';
+import { actions } from '../redux/actions';
 
 const useStyles = makeStyles({
     appBar: {
@@ -60,6 +62,15 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
     const classes = useStyles();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const toggleNotifications = () => {
+        navigate('/notifications')
+        dispatch({ type: actions.LOAD_NOTIFICATION, payload: true });
+        return(()=> {
+            dispatch({ type: actions.LOAD_NOTIFICATION, payload: false });
+        })
+    };
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -83,7 +94,10 @@ export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
                     </Button>
                     <Box sx={{ flexGrow: 0 }}>
                         <Tooltip title="Notifications">
-                            <IconButton className={classes.notificationButton} size="large"
+                            <IconButton
+                                onClick={toggleNotifications}
+                                className={classes.notificationButton}
+                                size="large"
                                 aria-label="show 17 new notifications"
                                 color="inherit">
                                 <Badge badgeContent={4} color="secondary">
