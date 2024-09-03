@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import utils from '../utils';
 import { useDispatch } from 'react-redux';
 import { actions } from '../redux/actions';
+import axios from 'axios';
 
 const useStyles = makeStyles({
     locationCard: {
@@ -74,12 +75,30 @@ const useStyles = makeStyles({
         color: 'white !important',
     }
 });
+const url =
+    process.env.NODE_ENV === 'production'
+        ? process.env.REACT_APP_PROD_BACKEND_URL
+        : process.env.REACT_APP_DEV_BACKEND_URL;
 
 export const LocationLayout = ({ onConfirm }) => {
-    const dispatch = useDispatch();
     const [selectedDistance, setSelectedDistance] = useState(null);
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const classes = useStyles({ isButtonDisabled });
+    const role = localStorage.getItem('role');
+    const adminId = localStorage.getItem('adminId');
+    const userId = localStorage.getItem('userId');
+    const isAdmin = role && role.toLowerCase() === 'admin';
+    const id = isAdmin ? adminId : userId;
+    const adminNotification = "Remember to pay money for trash by Tuesday";
+    const userNotification = "The security guard has been notified to open the gate."
+    const content = isAdmin ? adminNotification : userNotification;
+
+    const notification = {
+        user_id: id,
+        content: content,
+        notification_type: isAdmin ? "order" : "security",
+        status: "unread"
+    }
 
     const handleCardClick = (distance) => {
         setSelectedDistance(distance);
@@ -87,17 +106,22 @@ export const LocationLayout = ({ onConfirm }) => {
     };
 
     const handleContinueClick = () => {
-        Swal.fire('Security guard notified!', 'The security guard has been notified to open the gate.', 'success').then(() => {
+        Swal.fire('Security guard notified!', content, 'success').then(() => {
             notifyAdmin(selectedDistance);
-            dispatch({ type: actions.CLOSE_LOCATION_CARDS, payload: false });
             onConfirm();
         });
     };
 
-    const notifyAdmin = (distance) => {
-        // Logic to send alert to the admin and security app
-        console.log(`Admin notified to open the gate. Distance: ${distance}`);
-        // You might want to implement this with a real-time service like Firebase or a server API.
+    const notifyAdmin = async (distance) => {
+        const endpoint = `/api/notifications/create`;
+        try {
+            const response = await axios.post(`${url}${endpoint}`, notification, {
+                headers: { 'Content-Type': 'application/json' },
+            });
+            console.log("response", response)
+        } catch (error) {
+            console.error('Failed to fetch notifications:', error);
+        }
     };
 
     return (

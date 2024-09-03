@@ -45,7 +45,6 @@ const useStyles = makeStyles({
 
 export const MainLayout = () => {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
     const classes = useStyles();
     const [anchorElUser, setAnchorElUser] = useState(null);
     const [slideRight, setSlideRight] = useState(false);
@@ -54,6 +53,9 @@ export const MainLayout = () => {
     const [chooseLocation, setChooseLocation] = useState(false);
     const [isLocationCardVisible, setIsLocationCardVisible] = useState(false);
     const isLocationCard = useSelector(state => state.location.showLocationCards);
+    const path = window.location.pathname.split('/').pop();
+    const isNotification = path === 'notifications';
+
     const getUserDetails = useCallback(async () => {
         const id = localStorage.getItem("id");
         try {
@@ -85,6 +87,7 @@ export const MainLayout = () => {
 
     const getVehicles = useCallback(async () => {
         const id = localStorage.getItem("id");
+        console.log("id", id)
         try {
             const response = await axios.post(
                 `${url}/vehicles/list/${id}`,
@@ -141,7 +144,6 @@ export const MainLayout = () => {
     const handleSlide = () => {
         setSlideRight(true);
         setChooseLocation(true);
-        dispatch({ type: actions.ADD_LOCATION_CARDS, payload: true });
     };
 
     const handleSweetAlertConfirm = () => {
@@ -196,11 +198,13 @@ export const MainLayout = () => {
     };
     return (
         <Box sx={{ flexGrow: 1 }}>
-            <Header
-                onOpenUserMenu={handleOpenUserMenu}
-                anchorElUser={anchorElUser}
-                onCloseUserMenu={handleCloseUserMenu}
-            />
+            {!isNotification &&
+                <Header
+                    onOpenUserMenu={handleOpenUserMenu}
+                    anchorElUser={anchorElUser}
+                    onCloseUserMenu={handleCloseUserMenu}
+                />
+            }
             <Box sx={{ p: 2 }}>
                 <Typography className={classes.welcomeText}>
                     {` Hey,`} <span className={classes.user}>{`${user?.name || 'User'}`}</span>
