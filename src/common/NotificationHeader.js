@@ -17,16 +17,25 @@ const NotificationHeader = ({ onDeleteNotifications }) => {
 
     return (
         <Box display="flex" alignItems="center" justifyContent="space-between" p={2}>
-            <IconButton onClick={handleBack} aria-label="back">
+            <IconButton
+                onClick={handleBack}
+                aria-label="back"
+                sx={{ backgroundColor: '#F2F4F8 !important' }}
+            >
                 <ArrowBackIcon />
             </IconButton>
             <Typography variant="h6" component="div">
                 Notifications
             </Typography>
-            <IconButton onClick={onDeleteNotifications} aria-label="delete all notifications">
+            <IconButton
+                onClick={onDeleteNotifications}
+                aria-label="delete all notifications"
+                sx={{ backgroundColor: '#F2F4F8 !important' }}
+            >
                 <DeleteIcon />
             </IconButton>
         </Box>
+
     );
 };
 

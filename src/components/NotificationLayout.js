@@ -45,13 +45,13 @@ const getIcon = (type) => {
 
 const NotificationLayout = () => {
     const [notifications, setNotifications] = useState([]);
-    const openNotification = useSelector(state => state.location.openNotification);
     const role = localStorage.getItem('role');
     const adminId = localStorage.getItem('adminId');
     const userId = localStorage.getItem('userId');
     const isAdmin = role && role.toLowerCase() === 'admin';
     const id = isAdmin ? adminId : userId;
-
+    const path = window.location.pathname.split('/').pop();
+    const isMain = path === 'Main';
     useEffect(() => {
         const fetchNotifications = async () => {
             const endpoint = isAdmin ? `/api/notifications/all` : `/api/notifications/user`;
@@ -66,8 +66,8 @@ const NotificationLayout = () => {
     }, [isAdmin, id]);
 
     return (
-        <div style={{ padding: '20px' }}>
-            {openNotification &&
+        <div style={{ paddingLeft: '10px', paddingRight: '10px' }}>
+            {!isMain &&
                 <>
                     <NotificationHeader onDeleteNotifications={() => console.log('Delete all notifications')} />
                 </>
