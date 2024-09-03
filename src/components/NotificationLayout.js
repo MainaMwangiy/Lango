@@ -31,16 +31,16 @@ const getIcon = (type) => {
     }
 };
 
-const getStatusColor = (status) => {
-    switch (status) {
-        case 'unread':
-            return '#f0f0f0';
-        case 'read':
-            return '#e0e0e0';
-        default:
-            return '#ffffff';
-    }
-};
+// const getStatusColor = (status) => {
+//     switch (status) {
+//         case 'unread':
+//             return '#f0f0f0';
+//         case 'read':
+//             return '#e0e0e0';
+//         default:
+//             return '#ffffff';
+//     }
+// };
 
 const NotificationLayout = () => {
     const [notifications, setNotifications] = useState([]);
@@ -62,7 +62,7 @@ const NotificationLayout = () => {
             }
         };
         fetchNotifications();
-    }, [isAdmin]);
+    }, [isAdmin, id]);
 
     return (
         <div style={{ padding: '20px' }}>

@@ -87,6 +87,7 @@ export const MainLayout = () => {
 
     const getVehicles = useCallback(async () => {
         const id = localStorage.getItem("id");
+        console.log("id", id)
         try {
             const response = await axios.post(
                 `${url}/vehicles/list/${id}`,
