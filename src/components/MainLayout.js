@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router';
 import { LocationLayout } from './LocationLayout';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions } from '../redux/actions';
+import utils from '../utils';
 const url = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_BACKEND_URL : process.env.REACT_APP_DEV_BACKEND_URL;
 const useStyles = makeStyles({
     welcomeText: {
@@ -56,6 +57,8 @@ export const MainLayout = () => {
     const isLocationCard = useSelector(state => state.location.showLocationCards);
     const path = window.location.pathname.split('/').pop();
     const isNotification = path === 'notifications';
+    const auth = utils.auth;
+    const gitHubUser = auth?.currentUser;
 
     const getUserDetails = useCallback(async () => {
         const id = localStorage.getItem("id");
@@ -88,7 +91,6 @@ export const MainLayout = () => {
 
     const getVehicles = useCallback(async () => {
         const id = localStorage.getItem("id");
-        console.log("id", id)
         try {
             const response = await axios.post(
                 `${url}/vehicles/list/${id}`,
@@ -209,7 +211,7 @@ export const MainLayout = () => {
             }
             <Box sx={{ p: 2 }}>
                 <Typography className={classes.welcomeText}>
-                    {` Hey,`} <span className={classes.user}>{`${user?.name || 'User'}`}</span>
+                    {` Hey,`} <span className={classes.user}>{`${user?.name || gitHubUser.displayName}`}</span>
                 </Typography>
                 <Typography className={classes.openText}>
                     {` Request Gate to be opened`}

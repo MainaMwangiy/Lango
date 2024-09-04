@@ -3,14 +3,16 @@ import headerImage from '../assets/loginHeader.svg';
 import { makeStyles } from '@material-ui/core';
 import { Button, IconButton, InputAdornment, TextField } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
-import FacebookIcon from '@mui/icons-material/Facebook';
+// import FacebookIcon from '@mui/icons-material/Facebook';
 import { GitHub } from '@mui/icons-material';
 import theme from '../theme';
-import { useLocation, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { useDispatch } from 'react-redux';
+import utils from '../utils';
 
 const useStyles = makeStyles({
     root: {
@@ -101,43 +103,16 @@ const url =
 
 export const AuthLayout = () => {
     const classes = useStyles();
-    const location = useLocation();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [formData, setFormData] = useState(initialValues);
     const [showPassword, setShowPassword] = useState(false);
-    const [isGitHub, setIsGitHub] = useState(false);
-    const exchangeCodeForToken = async (code) => {
-        try {
-            const response = await axios.get(`http://localhost:3000/api/auth/github/callback?code=${code}`);
-            if (response.data.success) {
-                localStorage.setItem('token', response.data.token);  // Store the token or handle it as you see fit
-                navigate('/Main');  // Redirect to main page or dashboard
-            } else {
-                console.error('Failed to login with GitHub:', response.data.message);
-                navigate('/login', { replace: true });
-            }
-        } catch (error) {
-            console.error('Error during GitHub login:', error);
-            navigate('/login', { replace: true });
-        }
-    };
+
     useEffect(() => {
         const token = localStorage.getItem('token');
         const id = localStorage.getItem('id');
-        console.log("Current URL Search Part:", window.location.search);
-        const code = new URLSearchParams(window.location.search).get('code');
-        console.log("Extracted Code:", code);
-
-        if (isGitHub) {
-            if (code) {
-                exchangeCodeForToken(code);
-            } else {
-                navigate('/login', { replace: true });
-            }
-        } else {
-            if (token && id) {
-                navigate('/Main');
-            }
+        if (token && id) {
+            navigate('/Main');
         }
     }, [navigate]);
 
@@ -152,31 +127,36 @@ export const AuthLayout = () => {
 
     const login = async (e) => {
         e.preventDefault();
+        const token = localStorage.getItem('token');
         try {
-            const response = await axios.post(`${url}/auth/login`, formData, {
-                headers: { 'Content-Type': 'application/json' },
-            });
-            if (response.data.success) {
-                Swal.fire({
-                    title: 'Success',
-                    text: `${formData.email} Logged In Successfully`,
-                    icon: 'success',
-                });
-                localStorage.setItem('token', response.data.token);
-                localStorage.setItem('id', response.data.id);
-                localStorage.setItem('role', response.data.role);
-                if (response.data.role === 'admin') {
-                    localStorage.setItem('adminId', response.data.id);
-                } else {
-                    localStorage.setItem('userId', response.data.id);
-                }
+            if (token) {
                 navigate('/Main');
             } else {
-                Swal.fire({
-                    title: 'Error',
-                    icon: 'error',
-                    text: 'Login Failed',
+                const response = await axios.post(`${url}/auth/login`, formData, {
+                    headers: { 'Content-Type': 'application/json' },
                 });
+                if (response.data.success) {
+                    Swal.fire({
+                        title: 'Success',
+                        text: `${formData.email} Logged In Successfully`,
+                        icon: 'success',
+                    });
+                    localStorage.setItem('token', response.data.token);
+                    localStorage.setItem('id', response.data.id);
+                    localStorage.setItem('role', response.data.role);
+                    if (response.data.role === 'admin') {
+                        localStorage.setItem('adminId', response.data.id);
+                    } else {
+                        localStorage.setItem('userId', response.data.id);
+                    }
+                    navigate('/Main');
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        icon: 'error',
+                        text: 'Login Failed',
+                    });
+                }
             }
         } catch (error) {
             Swal.fire({
@@ -186,14 +166,6 @@ export const AuthLayout = () => {
             });
         }
     };
-    const redirectToGitHub = () => {
-        setIsGitHub(true);
-        const client_id = process.env.REACT_APP_GITHUB_CLIENT_ID || 'Ov23liCshRu01XGKySxK';
-        const redirect_uri = "http://localhost:3000/Main";
-        const scope = "read:user";
-        const authUrl = `https://github.com/login/oauth/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}`;
-        window.location.href = authUrl;
-    }
     return (
         <div className={classes.root}>
             <div className={classes.header}></div>
@@ -232,7 +204,7 @@ export const AuthLayout = () => {
                 <Button className={classes.googleButton}>
                     <GoogleIcon /> Sign in with Google
                 </Button>
-                <Button className={classes.facebookButton} onClick={redirectToGitHub}>
+                <Button className={classes.facebookButton} onClick={() => utils.gitHubSignIn({ navigate, dispatch })}>
                     <GitHub /> Sign in with GitHub
                 </Button>
                 {/* <Button className={classes.facebookButton}>
