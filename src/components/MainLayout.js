@@ -45,6 +45,7 @@ const useStyles = makeStyles({
 
 export const MainLayout = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const classes = useStyles();
     const [anchorElUser, setAnchorElUser] = useState(null);
     const [slideRight, setSlideRight] = useState(false);
@@ -144,6 +145,7 @@ export const MainLayout = () => {
     const handleSlide = () => {
         setSlideRight(true);
         setChooseLocation(true);
+        dispatch({ type: actions.ADD_LOCATION_CARDS, payload: true });
     };
 
     const handleSweetAlertConfirm = () => {
