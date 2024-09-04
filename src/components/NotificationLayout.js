@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import NotificationHeader from '../common/NotificationHeader';
-import { useSelector } from 'react-redux';
 import MailIcon from '@mui/icons-material/Mail';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import SecurityIcon from '@mui/icons-material/Security';
@@ -9,6 +8,7 @@ import CommentIcon from '@mui/icons-material/Comment';
 import SubscriptionIcon from '@mui/icons-material/Subscriptions';
 import { Avatar, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
 import dayjs from 'dayjs';
+// import { useSelector } from 'react-redux';
 
 const url =
     process.env.NODE_ENV === 'production'
@@ -52,6 +52,8 @@ const NotificationLayout = () => {
     const id = isAdmin ? adminId : userId;
     const path = window.location.pathname.split('/').pop();
     const isMain = path === 'Main';
+    // const openNotification = useSelector(state => state.location.openNotification);
+
     useEffect(() => {
         const fetchNotifications = async () => {
             const endpoint = isAdmin ? `/api/notifications/all` : `/api/notifications/user`;

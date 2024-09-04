@@ -81,6 +81,7 @@ const url =
         : process.env.REACT_APP_DEV_BACKEND_URL;
 
 export const LocationLayout = ({ onConfirm }) => {
+    const dispatch = useDispatch();
     const [selectedDistance, setSelectedDistance] = useState(null);
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const classes = useStyles({ isButtonDisabled });
@@ -108,6 +109,7 @@ export const LocationLayout = ({ onConfirm }) => {
     const handleContinueClick = () => {
         Swal.fire('Security guard notified!', content, 'success').then(() => {
             notifyAdmin(selectedDistance);
+            dispatch({ type: actions.CLOSE_LOCATION_CARDS, payload: false });
             onConfirm();
         });
     };

@@ -11,6 +11,7 @@ import NewVersionNotification from './NewVersionNotification';
 import store from './redux/store';
 import { Provider } from 'react-redux';
 import NotificationLayout from './components/NotificationLayout';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 function App() {
   const [isNewVersionAvailable, setIsNewVersionAvailable] = useState(false);
@@ -54,6 +55,7 @@ function App() {
   return (
     <Provider store={store}>
       <BrowserRouter>
+        <SpeedInsights />
         {!navigator.onLine && isNewVersionAvailable && <NewVersionNotification onInstall={handleInstall} onCancel={handleCancel} />}
         <Routes>
           <Route path="/" element={<HomeLayout configKey="Home" version={versionDetails} {...config} />} />
