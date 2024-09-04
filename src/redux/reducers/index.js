@@ -3,7 +3,8 @@ import { actions } from "../actions";
 
 const initialState = {
     showLocationCards: false,
-    openNotification: false
+    openNotification: false,
+    user: {}
 };
 
 const locationReducer = (state = initialState, action) => {
@@ -14,6 +15,8 @@ const locationReducer = (state = initialState, action) => {
             return { ...state, showLocationCards: false };
         case actions.LOAD_NOTIFICATION:
             return { ...state, openNotification: true };
+        case actions.LOAD_USER:
+            return { ...state, user: action.payload };
         default:
             return state;
     }

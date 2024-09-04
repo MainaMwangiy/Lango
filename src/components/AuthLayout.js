@@ -3,13 +3,16 @@ import headerImage from '../assets/loginHeader.svg';
 import { makeStyles } from '@material-ui/core';
 import { Button, IconButton, InputAdornment, TextField } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
-import FacebookIcon from '@mui/icons-material/Facebook';
+// import FacebookIcon from '@mui/icons-material/Facebook';
+import { GitHub } from '@mui/icons-material';
 import theme from '../theme';
 import { useNavigate } from 'react-router';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { useDispatch } from 'react-redux';
+import utils from '../utils';
 
 const useStyles = makeStyles({
     root: {
@@ -62,6 +65,14 @@ const useStyles = makeStyles({
             backgroundColor: '#365899 !important',
         },
     },
+    gitHubButton: {
+        backgroundColor: '#24292e !important',
+        padding: '10px 20px !important',
+        color: '#ffffff !important',
+        '&:hover': {
+            backgroundColor: '#24292e !important',
+        },
+    },
     signInText: {
         fontSize: "25px",
         fontFamily: "Lato"
@@ -93,6 +104,7 @@ const url =
 export const AuthLayout = () => {
     const classes = useStyles();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [formData, setFormData] = useState(initialValues);
     const [showPassword, setShowPassword] = useState(false);
 
@@ -115,31 +127,36 @@ export const AuthLayout = () => {
 
     const login = async (e) => {
         e.preventDefault();
+        const token = localStorage.getItem('token');
         try {
-            const response = await axios.post(`${url}/auth/login`, formData, {
-                headers: { 'Content-Type': 'application/json' },
-            });
-            if (response.data.success) {
-                Swal.fire({
-                    title: 'Success',
-                    text: `${formData.email} Logged In Successfully`,
-                    icon: 'success',
-                });
-                localStorage.setItem('token', response.data.token);
-                localStorage.setItem('id', response.data.id);
-                localStorage.setItem('role', response.data.role);
-                if (response.data.role === 'admin') {
-                    localStorage.setItem('adminId', response.data.id);
-                } else {
-                    localStorage.setItem('userId', response.data.id);
-                }
+            if (token) {
                 navigate('/Main');
             } else {
-                Swal.fire({
-                    title: 'Error',
-                    icon: 'error',
-                    text: 'Login Failed',
+                const response = await axios.post(`${url}/auth/login`, formData, {
+                    headers: { 'Content-Type': 'application/json' },
                 });
+                if (response.data.success) {
+                    Swal.fire({
+                        title: 'Success',
+                        text: `${formData.email} Logged In Successfully`,
+                        icon: 'success',
+                    });
+                    localStorage.setItem('token', response.data.token);
+                    localStorage.setItem('id', response.data.id);
+                    localStorage.setItem('role', response.data.role);
+                    if (response.data.role === 'admin') {
+                        localStorage.setItem('adminId', response.data.id);
+                    } else {
+                        localStorage.setItem('userId', response.data.id);
+                    }
+                    navigate('/Main');
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        icon: 'error',
+                        text: 'Login Failed',
+                    });
+                }
             }
         } catch (error) {
             Swal.fire({
@@ -187,9 +204,12 @@ export const AuthLayout = () => {
                 <Button className={classes.googleButton}>
                     <GoogleIcon /> Sign in with Google
                 </Button>
-                <Button className={classes.facebookButton}>
-                    <FacebookIcon /> Sign in with Facebook
+                <Button className={classes.facebookButton} onClick={() => utils.gitHubSignIn({ navigate, dispatch })}>
+                    <GitHub /> Sign in with GitHub
                 </Button>
+                {/* <Button className={classes.facebookButton}>
+                    <FacebookIcon /> Sign in with Facebook
+                </Button> */}
             </form>
             {/* Commenting out this Registration section as at the moment I dont need it. user details created from the dashboard */}
             {/* <div className={classes.authChange}>Don't have an account? <span className={classes.signInInner}>Register</span></div> */}
