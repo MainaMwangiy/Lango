@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Typography, Button, Card, CardContent, Avatar } from '@mui/material';
 import { makeStyles } from '@material-ui/core';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import Swal from 'sweetalert2';
+import utils from '../utils';
+import { useDispatch } from 'react-redux';
+import { actions } from '../redux/actions';
+import axios from 'axios';
 
 const useStyles = makeStyles({
     locationCard: {
@@ -27,8 +32,11 @@ const useStyles = makeStyles({
     continueButton: {
         borderRadius: '25px !important',
         textTransform: 'none !important',
-        backgroundColor: '#4CAF50 !important',
+        backgroundColor: (props) => (props.isButtonDisabled ? 'gray' : '#4CAF50 !important'),
         color: 'white !important',
+        '&:hover': {
+            backgroundColor: (props) => (props.isButtonDisabled ? 'gray' : '#4CAF50 !important'),
+        },
     },
     cardsContainer: {
         overflowY: 'auto !important',
@@ -42,44 +50,102 @@ const useStyles = makeStyles({
         margin: '10px 0 !important',
         boxShadow: '#ffffff !important',
         borderRadius: '20px !important',
+        cursor: 'pointer',
+        transition: 'background-color 0.3s, color 0.3s'
     },
     cardContent: {
-        display: 'flex !important',
-        alignItems: 'center !important',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     avatar: {
         marginRight: '16px !important',
     },
     distanceText: {
         fontWeight: 'bold !important',
-        padding: "10px !important"
+        padding: "10px !important",
+        marginLeft: 2
     },
     locationText: {
         color: "#252B5C !important",
         fontSize: "23px  !important"
+    },
+    selectedCard: {
+        backgroundColor: '#4CAF50 !important',
+        color: 'white !important',
     }
 });
+const url =
+    process.env.NODE_ENV === 'production'
+        ? process.env.REACT_APP_PROD_BACKEND_URL
+        : process.env.REACT_APP_DEV_BACKEND_URL;
 
-export const LocationLayout = () => {
-    const classes = useStyles();
-    const distances = [
-        '0 - 50m',
-        '50 - 100m',
-        '100 - 150m',
-        '150 - 200m'
-    ];
+export const LocationLayout = ({ onConfirm }) => {
+    const dispatch = useDispatch();
+    const [selectedDistance, setSelectedDistance] = useState(null);
+    const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+    const classes = useStyles({ isButtonDisabled });
+    const role = localStorage.getItem('role');
+    const adminId = localStorage.getItem('adminId');
+    const userId = localStorage.getItem('userId');
+    const isAdmin = role && role.toLowerCase() === 'admin';
+    const id = isAdmin ? adminId : userId;
+    const adminNotification = "Remember to pay money for trash by Tuesday";
+    const userNotification = "The security guard has been notified to open the gate."
+    const content = isAdmin ? adminNotification : userNotification;
+
+    const notification = {
+        user_id: id,
+        content: content,
+        notification_type: isAdmin ? "order" : "security",
+        status: "unread"
+    }
+
+    const handleCardClick = (distance) => {
+        setSelectedDistance(distance);
+        setIsButtonDisabled(false);
+    };
+
+    const handleContinueClick = () => {
+        Swal.fire('Security guard notified!', content, 'success').then(() => {
+            notifyAdmin(selectedDistance);
+            dispatch({ type: actions.CLOSE_LOCATION_CARDS, payload: false });
+            onConfirm();
+        });
+    };
+
+    const notifyAdmin = async (distance) => {
+        const endpoint = `/api/notifications/create`;
+        try {
+            const response = await axios.post(`${url}${endpoint}`, notification, {
+                headers: { 'Content-Type': 'application/json' },
+            });
+            console.log("response", response)
+        } catch (error) {
+            console.error('Failed to fetch notifications:', error);
+        }
+    };
 
     return (
         <Box className={classes.locationCard}>
             <Box className={classes.distanceSelectHeader}>
                 <Typography variant="h6" className={classes.locationText}>{"Select Location Distance"}</Typography>
-                <Button variant="contained" color="primary" className={classes.continueButton}>
-                    {"  Continue"}
+                <Button
+                    variant="contained"
+                    className={classes.continueButton}
+                    onClick={handleContinueClick}
+                    disabled={isButtonDisabled}
+                >
+                    {"Continue"}
                 </Button>
             </Box>
             <Box className={classes.cardsContainer}>
-                {distances.map((distance, index) => (
-                    <Card key={index} className={classes.card}>
+                {utils.distances.map((distance, index) => (
+                    <Card
+                        key={index}
+                        className={`${classes.card} ${selectedDistance === distance ? classes.selectedCard : ''}`}
+                        onClick={() => handleCardClick(distance)}
+                    >
                         <CardContent className={classes.cardContent}>
                             <Avatar>
                                 <LocationOnIcon />
