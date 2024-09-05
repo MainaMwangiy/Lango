@@ -1,4 +1,4 @@
-import { getAuth, GithubAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAuth, GithubAuthProvider, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { actions } from "../redux/actions";
 import { initializeApp } from "firebase/app";
 
@@ -13,8 +13,8 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const provider = new GithubAuthProvider();
-
+const gitHubProvider = new GithubAuthProvider();
+const googleProvider = new GoogleAuthProvider();
 const utils = {
     distances: [
         '0 - 50m',
@@ -25,7 +25,8 @@ const utils = {
     firebaseConfig: firebaseConfig,
     app: app,
     auth: auth,
-    provider: provider,
+    gitHubProvider: gitHubProvider,
+    googleProvider: googleProvider,
     gitHubSignIn: ({ navigate, dispatch }) => {
         const token = localStorage.getItem('token');
         const isToken = token === null || token === '';
@@ -34,7 +35,7 @@ const utils = {
             return;
         }
         try {
-            signInWithPopup(auth, provider)
+            signInWithPopup(auth, gitHubProvider)
                 .then((result) => {
                     const credential = GithubAuthProvider.credentialFromResult(result);
                     const token = credential.accessToken;
@@ -48,6 +49,30 @@ const utils = {
                 });
         } catch (error) {
             console.error('GitHub sign-in failed:', error);
+        }
+    },
+    googleSignIn: ({ navigate, dispatch }) => {
+        const token = localStorage.getItem('token');
+        const isToken = token === null || token === '';
+        if (auth.currentUser && !isToken) {
+            navigate('/Main')
+            return;
+        }
+        try {
+            signInWithPopup(auth, googleProvider)
+                .then((result) => {
+                    const credential = GoogleAuthProvider.credentialFromResult(result);
+                    const token = credential.accessToken;
+                    localStorage.setItem('token', token)
+                    const user = result.user;
+                    dispatch({ type: actions.LOAD_USER, payload: user })
+                    navigate('/Main')
+                })
+                .catch((error) => {
+                    console.error('Error during Google login:', error.message);
+                });
+        } catch (error) {
+            console.error('Google sign-in failed:', error);
         }
     }
 };
