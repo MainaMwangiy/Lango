@@ -58,7 +58,7 @@ export const MainLayout = () => {
     const path = window.location.pathname.split('/').pop();
     const isNotification = path === 'notifications';
     const auth = utils.auth;
-    const gitHubUser = auth?.currentUser;
+    const ssoUser = auth?.currentUser;
 
     const getUserDetails = useCallback(async () => {
         const id = localStorage.getItem("id");
@@ -211,7 +211,7 @@ export const MainLayout = () => {
             }
             <Box sx={{ p: 2 }}>
                 <Typography className={classes.welcomeText}>
-                    {` Hey,`} <span className={classes.user}>{`${user?.name || gitHubUser.displayName}`}</span>
+                    {` Hey,`} <span className={classes.user}>{`${user?.name || ssoUser?.displayName}`}</span>
                 </Typography>
                 <Typography className={classes.openText}>
                     {` Request Gate to be opened`}
