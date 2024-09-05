@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import headerImage from '../assets/loginHeader.svg';
 import { makeStyles } from '@material-ui/core';
 import { Button, IconButton, InputAdornment, TextField } from '@mui/material';
-import GoogleIcon from '@mui/icons-material/Google';
-// import FacebookIcon from '@mui/icons-material/Facebook';
-import { GitHub } from '@mui/icons-material';
+import { GitHub, Google } from '@mui/icons-material';
 import theme from '../theme';
 import { useNavigate } from 'react-router';
 import Swal from 'sweetalert2';
@@ -58,7 +56,7 @@ const useStyles = makeStyles({
         },
     },
     facebookButton: {
-        backgroundColor: '#4267B2 !important',
+        backgroundColor: '#333 !important',
         padding: '10px 20px !important',
         color: '#ffffff !important',
         '&:hover': {
@@ -201,8 +199,8 @@ export const AuthLayout = () => {
                 <Button className={classes.loginButton} type="submit">
                     Login
                 </Button>
-                <Button className={classes.googleButton}>
-                    <GoogleIcon /> Sign in with Google
+                <Button className={classes.googleButton} onClick={() => utils.googleSignIn({ navigate, dispatch })}>
+                    <Google /> Sign in with Google
                 </Button>
                 <Button className={classes.facebookButton} onClick={() => utils.gitHubSignIn({ navigate, dispatch })}>
                     <GitHub /> Sign in with GitHub
