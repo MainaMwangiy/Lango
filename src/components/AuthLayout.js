@@ -11,6 +11,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useDispatch } from 'react-redux';
 import utils from '../utils';
+import { actions } from '../redux/actions';
 
 const useStyles = makeStyles({
     root: {
@@ -147,6 +148,7 @@ export const AuthLayout = () => {
                     } else {
                         localStorage.setItem('userId', response.data.id);
                     }
+                    dispatch({ type: actions.LOAD_USER, user: response.data })
                     navigate('/Main');
                 } else {
                     Swal.fire({
