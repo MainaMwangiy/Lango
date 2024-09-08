@@ -77,8 +77,9 @@ export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
         localStorage.removeItem('id');
         localStorage.removeItem('user');
         localStorage.removeItem('role');
-        localStorage.removeItem('admimId');
+        localStorage.removeItem('adminId');
         localStorage.removeItem('userId');
+        localStorage.removeItem('vehicles');
         navigate('/login');
     };
 

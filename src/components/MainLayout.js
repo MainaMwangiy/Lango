@@ -234,12 +234,11 @@ export const MainLayout = () => {
                 </Typography>
                 <CommonCard details={apartmentDetails} />
                 <CommonCard details={vehiclesData} />
-
-                <Typography className={classes.slideMessage}>
-                    {` Please slide button to the right to request the gate to be opened.`}
-                </Typography>
                 {!isAdmin &&
                     <>
+                        <Typography className={classes.slideMessage}>
+                            {` Please slide button to the right to request the gate to be opened.`}
+                        </Typography>
                         <div className={classes.slideTrack}>
                             <SliderButton
                                 variant="contained"
