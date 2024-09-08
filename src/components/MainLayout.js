@@ -12,6 +12,8 @@ import { LocationLayout } from './LocationLayout';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions } from '../redux/actions';
 import utils from '../utils';
+import vehicles from "../assets/vehicles/urus.jpg";
+
 const url = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_BACKEND_URL : process.env.REACT_APP_DEV_BACKEND_URL;
 const useStyles = makeStyles({
     welcomeText: {
@@ -44,6 +46,11 @@ const useStyles = makeStyles({
     },
 });
 
+const initialVehicles = {
+    "name": "Lamborgini Urus",
+    "description": "2500 cc",
+    "image_url": vehicles
+}
 export const MainLayout = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -103,7 +110,7 @@ export const MainLayout = () => {
             );
             if (response.data.success) {
                 const vehiclesData = response.data.data[0];
-                localStorage.setItem('vehicles', JSON.stringify(vehiclesData));
+                localStorage.setItem('vehicles', vehiclesData);
                 setVehicles(vehiclesData);
                 navigate("/Main");
             } else {
@@ -136,7 +143,7 @@ export const MainLayout = () => {
         }
         if (storedVehicles) {
             try {
-                const jsonVehicles = storedVehicles.length > 0 ? JSON.stringify(storedVehicles) : [];
+                const jsonVehicles = storedVehicles.length > 0 ? JSON.stringify(storedVehicles) : initialVehicles;
                 setVehicles(JSON.parse(jsonVehicles));
             } catch (error) {
                 console.error("Error parsing stored vehicles data:", error);
@@ -207,6 +214,8 @@ export const MainLayout = () => {
         }
         return null;
     };
+    const isVehicleData = vehicles === undefined || vehicles === null || vehicles === "undefined";
+    const vehiclesData = isVehicleData ? initialVehicles : vehicles;
     return (
         <Box sx={{ flexGrow: 1 }}>
             {!isNotification &&
@@ -224,7 +233,7 @@ export const MainLayout = () => {
                     {` Request Gate to be opened`}
                 </Typography>
                 <CommonCard details={apartmentDetails} />
-                <CommonCard details={vehicles} />
+                <CommonCard details={vehiclesData} />
 
                 <Typography className={classes.slideMessage}>
                     {` Please slide button to the right to request the gate to be opened.`}
