@@ -66,14 +66,19 @@ export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
 
     const toggleNotifications = () => {
         navigate('/notifications')
-        dispatch({ type: actions.LOAD_NOTIFICATION, payload: true });
-        return(()=> {
-            dispatch({ type: actions.LOAD_NOTIFICATION, payload: false });
+        dispatch({ type: actions.LOAD_NOTIFICATION, openNotification: true });
+        return (() => {
+            dispatch({ type: actions.LOAD_NOTIFICATION, openNotification: false });
         })
     };
 
     const handleLogout = () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('id');
+        localStorage.removeItem('user');
+        localStorage.removeItem('role');
+        localStorage.removeItem('admimId');
+        localStorage.removeItem('userId');
         navigate('/login');
     };
 

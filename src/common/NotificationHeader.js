@@ -12,7 +12,7 @@ const NotificationHeader = ({ onDeleteNotifications }) => {
 
     const handleBack = () => {
         navigate(-1);
-        dispatch({ type: actions.LOAD_NOTIFICATION, payload: false });
+        dispatch({ type: actions.LOAD_NOTIFICATION, openNotification: false });
     };
 
     return (

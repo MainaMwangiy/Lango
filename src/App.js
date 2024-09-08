@@ -8,10 +8,10 @@ import { MainLayout } from './components/MainLayout';
 import PrivateRoute from './components/ProtectedRoute';
 import version from '../package.json';
 import NewVersionNotification from './NewVersionNotification';
-import store from './redux/store';
 import { Provider } from 'react-redux';
 import NotificationLayout from './components/NotificationLayout';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import { store } from './redux/store';
 
 function App() {
   const [isNewVersionAvailable, setIsNewVersionAvailable] = useState(false);

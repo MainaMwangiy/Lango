@@ -54,11 +54,14 @@ export const MainLayout = () => {
     const [user, setUser] = useState(null);
     const [chooseLocation, setChooseLocation] = useState(false);
     const [isLocationCardVisible, setIsLocationCardVisible] = useState(false);
-    const isLocationCard = useSelector(state => state.location.showLocationCards);
+    const isLocationCard = useSelector(state => state.appReducer.showLocationCards);
+    const newUser = useSelector(state => state.appReducer.user);
     const path = window.location.pathname.split('/').pop();
     const isNotification = path === 'notifications';
     const auth = utils.auth;
     const ssoUser = auth?.currentUser;
+    const role = localStorage.getItem('role');
+    const isAdmin = role && role.toLowerCase() === 'admin';
 
     const getUserDetails = useCallback(async () => {
         const id = localStorage.getItem("id");
@@ -71,6 +74,7 @@ export const MainLayout = () => {
             if (response.data.success) {
                 const userData = response.data.data[0];
                 localStorage.setItem('user', JSON.stringify(userData));
+                dispatch({ type: actions.LOAD_USER, user: userData })
                 setUser(userData);
                 navigate("/Main");
             } else {
@@ -119,11 +123,11 @@ export const MainLayout = () => {
     }, [navigate]);
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
+        const storedUser = newUser || localStorage.getItem('user');
         const storedVehicles = localStorage.getItem('vehicles');
         if (storedUser) {
             try {
-                setUser(JSON.parse(storedUser));
+                setUser(storedUser);
             } catch (error) {
                 console.error("Error parsing stored user data:", error);
             }
@@ -147,7 +151,10 @@ export const MainLayout = () => {
     const handleSlide = () => {
         setSlideRight(true);
         setChooseLocation(true);
-        dispatch({ type: actions.ADD_LOCATION_CARDS, payload: true });
+        dispatch({ type: actions.ADD_LOCATION_CARDS, showLocationCards: true });
+        return (() => {
+            dispatch({ type: actions.ADD_LOCATION_CARDS, showLocationCards: false });
+        })
     };
 
     const handleSweetAlertConfirm = () => {
@@ -211,7 +218,7 @@ export const MainLayout = () => {
             }
             <Box sx={{ p: 2 }}>
                 <Typography className={classes.welcomeText}>
-                    {` Hey,`} <span className={classes.user}>{`${user?.name || ssoUser?.displayName}`}</span>
+                    {` Hey,`} <span className={classes.user}>{`${ssoUser?.displayName || user?.name || 'User'}`}</span>
                 </Typography>
                 <Typography className={classes.openText}>
                     {` Request Gate to be opened`}
@@ -222,22 +229,26 @@ export const MainLayout = () => {
                 <Typography className={classes.slideMessage}>
                     {` Please slide button to the right to request the gate to be opened.`}
                 </Typography>
-                <div className={classes.slideTrack}>
-                    <SliderButton
-                        variant="contained"
-                        onClick={handleSlide}
-                        sx={{
-                            position: 'absolute',
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            left: slideRight ? 'auto' : '0',
-                            right: slideRight ? '0' : 'auto',
-                        }}
-                    >
-                        {`Slide`}
-                    </SliderButton>
-                </div>
-                {loadLocationCards()}
+                {!isAdmin &&
+                    <>
+                        <div className={classes.slideTrack}>
+                            <SliderButton
+                                variant="contained"
+                                onClick={handleSlide}
+                                sx={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    left: slideRight ? 'auto' : '0',
+                                    right: slideRight ? '0' : 'auto',
+                                }}
+                            >
+                                {`Slide`}
+                            </SliderButton>
+                        </div>
+                        {loadLocationCards()}
+                    </>
+                }
             </Box>
         </Box>
     );
