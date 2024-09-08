@@ -56,7 +56,7 @@ function App() {
     <Provider store={store}>
       <BrowserRouter>
         <SpeedInsights />
-        {!navigator.onLine && isNewVersionAvailable && <NewVersionNotification onInstall={handleInstall} onCancel={handleCancel} />}
+        {isNewVersionAvailable && <NewVersionNotification onInstall={handleInstall} onCancel={handleCancel} />}
         <Routes>
           <Route path="/" element={<HomeLayout configKey="Home" version={versionDetails} {...config} />} />
           <Route path="/Login" element={<AuthLayout />} />
