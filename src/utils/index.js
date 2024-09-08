@@ -1,6 +1,9 @@
 import { getAuth, GithubAuthProvider, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { actions } from "../redux/actions";
 import { initializeApp } from "firebase/app";
+import axios from "axios";
+import { v4 as uuidv4 } from 'uuid';
+uuidv4();
 
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_GITHUB_SSO_API_KEY,
@@ -15,6 +18,10 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const gitHubProvider = new GithubAuthProvider();
 const googleProvider = new GoogleAuthProvider();
+const url =
+    process.env.NODE_ENV === 'production'
+        ? process.env.REACT_APP_PROD_BACKEND_URL
+        : process.env.REACT_APP_DEV_BACKEND_URL;
 const utils = {
     distances: [
         '0 - 50m',
@@ -27,52 +34,103 @@ const utils = {
     auth: auth,
     gitHubProvider: gitHubProvider,
     googleProvider: googleProvider,
-    gitHubSignIn: ({ navigate, dispatch }) => {
+    statusCode: 200 || 201,
+    adminUser: ["Admin", "User"],
+    normalUser: ["User"],
+    gitHubSignIn: async ({ navigate, dispatch }) => {
         const token = localStorage.getItem('token');
         const isToken = token === null || token === '';
         if (auth.currentUser && !isToken) {
-            navigate('/Main')
+            navigate('/Main');
             return;
         }
         try {
-            signInWithPopup(auth, gitHubProvider)
-                .then((result) => {
-                    const credential = GithubAuthProvider.credentialFromResult(result);
-                    const token = credential.accessToken;
-                    localStorage.setItem('token', token)
-                    const user = result.user;
-                    dispatch({ type: actions.LOAD_USER, payload: user })
-                    navigate('/Main')
+            const result = await signInWithPopup(auth, gitHubProvider);
+            const credential = GithubAuthProvider.credentialFromResult(result);
+            const token = credential.accessToken;
+            localStorage.setItem('token', token);
+            const user = result.user;
+            const newUser = {
+                name: user.displayName,
+                email: user.email,
+                phone: user.phoneNumber,
+                image_url: user.photoURL
+            }
+            const body = {
+                user_id: uuidv4(),
+                email: user.email,
+                name: user.displayName,
+                image_url: user.photoURL,
+                provider: 'github',
+                token: token,
+            };
+            const response = await axios.post(`${url}/auth/sso`, body, {
+                headers: { 'Content-Type': 'application/json' },
+            });
+            if (response && response?.status === utils.statusCode) {
+                const userData = await response.data;
+                localStorage.setItem('user', newUser);
+                localStorage.setItem('id', userData.user_id);
+                dispatch({ type: actions.LOAD_USER, user: user })
+                navigate('/Main');
+                return (() => {
+                    dispatch({ type: actions.LOAD_USER, user: {} })
                 })
-                .catch((error) => {
-                    console.error('Error during GitHub login:', error.message);
-                });
+            } else {
+                throw new Error('Failed to fetch user data');
+            }
         } catch (error) {
-            console.error('GitHub sign-in failed:', error);
+            console.error('GitHub sign-in failed:', error.message);
+            localStorage.removeItem('token');
+            navigate('/login');
         }
     },
-    googleSignIn: ({ navigate, dispatch }) => {
+    googleSignIn: async ({ navigate, dispatch }) => {
         const token = localStorage.getItem('token');
         const isToken = token === null || token === '';
         if (auth.currentUser && !isToken) {
-            navigate('/Main')
+            navigate('/Main');
             return;
         }
         try {
-            signInWithPopup(auth, googleProvider)
-                .then((result) => {
-                    const credential = GoogleAuthProvider.credentialFromResult(result);
-                    const token = credential.accessToken;
-                    localStorage.setItem('token', token)
-                    const user = result.user;
-                    dispatch({ type: actions.LOAD_USER, payload: user })
-                    navigate('/Main')
+            const result = await signInWithPopup(auth, new GoogleAuthProvider());
+            const credential = GoogleAuthProvider.credentialFromResult(result);
+            const token = credential.accessToken;
+            localStorage.setItem('token', token);
+            const user = result.user;
+            const newUser = {
+                name: user.displayName,
+                email: user.email,
+                phone: user.phoneNumber,
+                image_url: user.photoURL
+            }
+            const body = {
+                user_id: uuidv4(),
+                email: user.email,
+                name: user.displayName,
+                image_url: user.photoURL,
+                provider: 'google',
+                token: token,
+            };
+            const response = await axios.post(`${url}/auth/sso`, body, {
+                headers: { 'Content-Type': 'application/json' },
+            });
+            if (response && response?.status === utils.statusCode) {
+                const userData = await response.data;
+                localStorage.setItem('user', newUser);
+                localStorage.setItem('id', userData.user_id);
+                dispatch({ type: actions.LOAD_USER, user: user })
+                navigate('/Main');
+                return (() => {
+                    dispatch({ type: actions.LOAD_USER, user: {} })
                 })
-                .catch((error) => {
-                    console.error('Error during Google login:', error.message);
-                });
+            } else {
+                throw new Error('Failed to fetch user data');
+            }
         } catch (error) {
             console.error('Google sign-in failed:', error);
+            localStorage.removeItem('token');
+            navigate('/login');
         }
     }
 };

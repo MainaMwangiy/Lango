@@ -68,7 +68,7 @@ const useStyles = makeStyles({
     },
     locationText: {
         color: "#252B5C !important",
-        fontSize: "23px  !important"
+        fontSize: "18px  !important"
     },
     selectedCard: {
         backgroundColor: '#4CAF50 !important',
@@ -109,8 +109,11 @@ export const LocationLayout = ({ onConfirm }) => {
     const handleContinueClick = () => {
         Swal.fire('Security guard notified!', content, 'success').then(() => {
             notifyAdmin(selectedDistance);
-            dispatch({ type: actions.CLOSE_LOCATION_CARDS, payload: false });
             onConfirm();
+            dispatch({ type: actions.CLOSE_LOCATION_CARDS, showLocationCards: false });
+            return (() => {
+                dispatch({ type: actions.CLOSE_LOCATION_CARDS, showLocationCards: true });
+            })
         });
     };
 
@@ -129,7 +132,7 @@ export const LocationLayout = ({ onConfirm }) => {
     return (
         <Box className={classes.locationCard}>
             <Box className={classes.distanceSelectHeader}>
-                <Typography variant="h6" className={classes.locationText}>{"Select Location Distance"}</Typography>
+                <Typography variant="h6" className={classes.locationText}>{"Select distance from the gate"}</Typography>
                 <Button
                     variant="contained"
                     className={classes.continueButton}

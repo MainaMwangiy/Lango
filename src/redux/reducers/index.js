@@ -1,4 +1,3 @@
-import { combineReducers } from "redux";
 import { actions } from "../actions";
 
 const initialState = {
@@ -7,7 +6,7 @@ const initialState = {
     user: {}
 };
 
-const locationReducer = (state = initialState, action) => {
+const appReducer = (state = initialState, action) => {
     switch (action.type) {
         case actions.ADD_LOCATION_CARDS:
             return { ...state, showLocationCards: true };
@@ -22,8 +21,4 @@ const locationReducer = (state = initialState, action) => {
     }
 };
 
-const reducers = combineReducers({
-    location: locationReducer,
-});
-
-export default reducers;
+export default appReducer;
