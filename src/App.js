@@ -8,6 +8,10 @@ import { MainLayout } from './components/MainLayout';
 import PrivateRoute from './components/ProtectedRoute';
 import version from '../package.json';
 import NewVersionNotification from './NewVersionNotification';
+import { Provider } from 'react-redux';
+import NotificationLayout from './components/NotificationLayout';
+import { SpeedInsights } from '@vercel/speed-insights/react';
+import { store } from './redux/store';
 
 function App() {
   const [isNewVersionAvailable, setIsNewVersionAvailable] = useState(false);
@@ -49,14 +53,18 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
-      {isNewVersionAvailable && <NewVersionNotification onInstall={handleInstall} onCancel={handleCancel} />}
-      <Routes>
-        <Route path="/" element={<HomeLayout configKey="Home" version={versionDetails} {...config} />} />
-        <Route path="/Login" element={<AuthLayout />} />
-        <Route path="/Main" element={<PrivateRoute authenticated={true} component={MainLayout} />} />
-      </Routes>
-    </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
+        <SpeedInsights />
+        {isNewVersionAvailable && <NewVersionNotification onInstall={handleInstall} onCancel={handleCancel} />}
+        <Routes>
+          <Route path="/" element={<HomeLayout configKey="Home" version={versionDetails} {...config} />} />
+          <Route path="/Login" element={<AuthLayout />} />
+          <Route path="/Main" element={<PrivateRoute authenticated={true} component={MainLayout} />} />
+          <Route path="/notifications" element={<PrivateRoute authenticated={true} component={NotificationLayout} />} />
+        </Routes>
+      </BrowserRouter>
+    </Provider>
   );
 }
 

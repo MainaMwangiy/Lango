@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Header } from './Header';
 import { Box, Button, Typography } from '@mui/material';
 import CommonCard from '../common/Card';
@@ -8,7 +8,13 @@ import { styled } from '@mui/material/styles';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router';
-const url = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_BACKEND_URL : process.env.REACT_APP_DEV_BACKEND_URL
+import { LocationLayout } from './LocationLayout';
+import { useDispatch, useSelector } from 'react-redux';
+import { actions } from '../redux/actions';
+import utils from '../utils';
+import vehicles from "../assets/vehicles/urus.jpg";
+
+const url = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_BACKEND_URL : process.env.REACT_APP_DEV_BACKEND_URL;
 const useStyles = makeStyles({
     welcomeText: {
         color: "#252B5C !important",
@@ -40,16 +46,128 @@ const useStyles = makeStyles({
     },
 });
 
+const initialVehicles = {
+    "name": "Lamborgini Urus",
+    "description": "2500 cc",
+    "image_url": vehicles
+}
 export const MainLayout = () => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
     const classes = useStyles();
     const [anchorElUser, setAnchorElUser] = useState(null);
     const [slideRight, setSlideRight] = useState(false);
-    const [vehicles, setVehicles] = useState();
-    const [user, setUser] = useState();
-    const navigate = useNavigate();
+    const [vehicles, setVehicles] = useState(null);
+    const [user, setUser] = useState(null);
+    const [chooseLocation, setChooseLocation] = useState(false);
+    const [isLocationCardVisible, setIsLocationCardVisible] = useState(false);
+    const isLocationCard = useSelector(state => state.appReducer.showLocationCards);
+    const newUser = useSelector(state => state.appReducer.user);
+    const path = window.location.pathname.split('/').pop();
+    const isNotification = path === 'notifications';
+    const auth = utils.auth;
+    const ssoUser = auth?.currentUser;
+    const role = localStorage.getItem('role');
+    const isAdmin = role && role.toLowerCase() === 'admin';
+
+    const getUserDetails = useCallback(async () => {
+        const id = localStorage.getItem("id");
+        try {
+            const response = await axios.post(
+                `${url}/auth/users/${id}`,
+                {},
+                { headers: { "Content-Type": "application/json" } }
+            );
+            if (response.data.success) {
+                const userData = response.data.data[0];
+                localStorage.setItem('user', JSON.stringify(userData));
+                dispatch({ type: actions.LOAD_USER, user: userData })
+                setUser(userData);
+                navigate("/Main");
+            } else {
+                Swal.fire({
+                    title: "Error",
+                    icon: "error",
+                    text: "User Loading Failed",
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                title: "Error",
+                icon: "error",
+                text: "User Loading Failed",
+            });
+        }
+    }, [navigate]);
+
+    const getVehicles = useCallback(async () => {
+        const id = localStorage.getItem("id");
+        try {
+            const response = await axios.post(
+                `${url}/vehicles/list/${id}`,
+                {},
+                { headers: { "Content-Type": "application/json" } }
+            );
+            if (response.data.success) {
+                const vehiclesData = response.data.data[0];
+                localStorage.setItem('vehicles', vehiclesData);
+                setVehicles(vehiclesData);
+                navigate("/Main");
+            } else {
+                Swal.fire({
+                    title: "Error",
+                    icon: "error",
+                    text: "Failed to fetch vehicles",
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                title: "Error",
+                icon: "error",
+                text: "Failed to fetch vehicles",
+            });
+        }
+    }, [navigate]);
+
+    useEffect(() => {
+        const storedUser = newUser || localStorage.getItem('user');
+        const storedVehicles = localStorage.getItem('vehicles');
+        if (storedUser) {
+            try {
+                setUser(storedUser);
+            } catch (error) {
+                console.error("Error parsing stored user data:", error);
+            }
+        } else {
+            getUserDetails();
+        }
+        if (storedVehicles) {
+            try {
+                const jsonVehicles = storedVehicles.length > 0 ? JSON.stringify(storedVehicles) : initialVehicles;
+                setVehicles(JSON.parse(jsonVehicles));
+            } catch (error) {
+                console.error("Error parsing stored vehicles data:", error);
+            }
+        } else {
+            getVehicles();
+        }
+        setIsLocationCardVisible(isLocationCard && chooseLocation && slideRight);
+    }, [getUserDetails, getVehicles, isLocationCard, chooseLocation, slideRight]); //chooseLocation, slideRight remove if failing
+
 
     const handleSlide = () => {
         setSlideRight(true);
+        setChooseLocation(true);
+        dispatch({ type: actions.ADD_LOCATION_CARDS, showLocationCards: true });
+        return (() => {
+            dispatch({ type: actions.ADD_LOCATION_CARDS, showLocationCards: false });
+        })
+    };
+
+    const handleSweetAlertConfirm = () => {
+        setSlideRight(false);
+        setChooseLocation(false);
+        setIsLocationCardVisible(false);
     };
 
     const handleOpenUserMenu = (event) => {
@@ -59,66 +177,6 @@ export const MainLayout = () => {
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
-
-    useEffect(() => {
-        const getVehicles = async () => {
-            const id = localStorage.getItem("id");
-            try {
-                const response = await axios.post(
-                    `${url}/vehicles/list/${id}`,
-                    {
-                        headers: { "Content-Type": "application/json" },
-                    }
-                );
-                setVehicles(response?.data?.data[0])
-                if (response.data.success) {
-                    navigate("/Main");
-                } else {
-                    Swal.fire({
-                        title: "Error",
-                        icon: "error",
-                        text: "Login Failed",
-                    });
-                }
-            } catch (error) {
-                Swal.fire({
-                    title: "Error",
-                    icon: "error",
-                    text: "Login Failed",
-                });
-            }
-        }
-        const getUser = async () => {
-            const id = localStorage.getItem("id");
-            try {
-                const response = await axios.post(
-                    `${url}/auth/users/${id}`,
-                    {
-                        headers: { "Content-Type": "application/json" },
-                    }
-                );
-                setUser(response?.data?.data[0])
-                if (response.data.success) {
-                    navigate("/Main");
-                } else {
-                    Swal.fire({
-                        title: "Error",
-                        icon: "error",
-                        text: "User Loading Failed",
-                    });
-                }
-            } catch (error) {
-                Swal.fire({
-                    title: "Error",
-                    icon: "error",
-                    text: "User Loading Failed",
-                });
-            }
-        }
-        getUser();
-        getVehicles();
-    }, [navigate])
-
 
     const apartmentDetails = {
         image_url: apartments,
@@ -147,42 +205,59 @@ export const MainLayout = () => {
         zIndex: 1,
         textTransform: "none"
     });
+
+    const loadLocationCards = () => {
+        if (isLocationCardVisible) {
+            return (
+                <LocationLayout onConfirm={handleSweetAlertConfirm} />
+            );
+        }
+        return null;
+    };
+    const isVehicleData = vehicles === undefined || vehicles === null || vehicles === "undefined";
+    const vehiclesData = isVehicleData ? initialVehicles : vehicles;
     return (
         <Box sx={{ flexGrow: 1 }}>
-            <Header
-                onOpenUserMenu={handleOpenUserMenu}
-                anchorElUser={anchorElUser}
-                onCloseUserMenu={handleCloseUserMenu}
-            />
+            {!isNotification &&
+                <Header
+                    onOpenUserMenu={handleOpenUserMenu}
+                    anchorElUser={anchorElUser}
+                    onCloseUserMenu={handleCloseUserMenu}
+                />
+            }
             <Box sx={{ p: 2 }}>
                 <Typography className={classes.welcomeText}>
-                    {` Hey,`} <span className={classes.user}>{`${user?.name}`}</span>
+                    {` Hey,`} <span className={classes.user}>{`${ssoUser?.displayName || user?.name || 'User'}`}</span>
                 </Typography>
                 <Typography className={classes.openText}>
                     {` Request Gate to be opened`}
                 </Typography>
                 <CommonCard details={apartmentDetails} />
-                <CommonCard details={vehicles} />
-
-                <Typography className={classes.slideMessage}>
-                    {`  Please slide button to the right to request the gate to be opened.`}
-                </Typography>
-                <div className={classes.slideTrack}>
-                    <SliderButton
-                        variant="contained"
-                        onClick={handleSlide}
-                        sx={{
-                            position: 'absolute',
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            left: slideRight ? 'auto' : '0',
-                            right: slideRight ? '0' : 'auto',
-                        }}
-                    >
-                        {`Slide`}
-                    </SliderButton>
-                </div>
-            </Box >
-        </Box >
+                <CommonCard details={vehiclesData} />
+                {!isAdmin &&
+                    <>
+                        <Typography className={classes.slideMessage}>
+                            {` Please slide button to the right to request the gate to be opened.`}
+                        </Typography>
+                        <div className={classes.slideTrack}>
+                            <SliderButton
+                                variant="contained"
+                                onClick={handleSlide}
+                                sx={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    left: slideRight ? 'auto' : '0',
+                                    right: slideRight ? '0' : 'auto',
+                                }}
+                            >
+                                {`Slide`}
+                            </SliderButton>
+                        </div>
+                        {loadLocationCards()}
+                    </>
+                }
+            </Box>
+        </Box>
     );
 }
