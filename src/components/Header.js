@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { AppBar, Box, Toolbar, IconButton, Typography, Menu, MenuItem, Container, Avatar, Tooltip, Badge, Button } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { makeStyles } from '@material-ui/core';
@@ -8,6 +8,7 @@ import theme from '../theme';
 import { useNavigate } from 'react-router';
 import { useDispatch } from 'react-redux';
 import { actions } from '../redux/actions';
+import utils from '../utils';
 
 const useStyles = makeStyles({
     appBar: {
@@ -59,11 +60,17 @@ const useStyles = makeStyles({
 
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
-export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
+export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu, notificationCount }) => {
     const classes = useStyles();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-
+    const [location, setLocation] = useState({});
+    const user = localStorage.getItem('user');
+    if (!user) {
+        console.log("User Not Found")
+    }
+    const newUser = JSON.parse(user);
+    const { image_url } = newUser;
     const toggleNotifications = () => {
         navigate('/notifications')
         dispatch({ type: actions.LOAD_NOTIFICATION, openNotification: true });
@@ -71,15 +78,19 @@ export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
             dispatch({ type: actions.LOAD_NOTIFICATION, openNotification: false });
         })
     };
+    const clearCookies = () => {
+        const cookies = document.cookie.split(";");
+        cookies.forEach((cookie) => {
+            const cookieName = cookie.split("=")[0].trim();
+            document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        });
+    };
+
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('id');
-        localStorage.removeItem('user');
-        localStorage.removeItem('role');
-        localStorage.removeItem('adminId');
-        localStorage.removeItem('userId');
-        localStorage.removeItem('vehicles');
+        clearCookies();
+        localStorage.clear();
+        sessionStorage.clear();
         navigate('/login');
     };
 
@@ -90,13 +101,23 @@ export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
             onCloseUserMenu();
         }
     };
+
+    useEffect(() => {
+        const fetchLocation = async () => {
+            const location = await utils.getLocationFromIP();
+            setLocation(location)
+        };
+        fetchLocation();
+    }, []);
+    const address = location && `${location.city},  ${location.country}`;
+
     return (
         <AppBar position="static" className={classes.appBar} color="default">
             <Container maxWidth="xl">
                 <Toolbar disableGutters className={classes.toolbar}>
                     <Button component="div" className={classes.locationContainer}>
                         <img alt="Map" src={map} className={classes.location} />
-                        <Typography className={classes.locationText}>{`Kahawa, Nairobi`}</Typography>
+                        <Typography className={classes.locationText}>{address || `Kahawa, Nairobi`}</Typography>
                     </Button>
                     <Box sx={{ flexGrow: 0 }}>
                         <Tooltip title="Notifications">
@@ -106,14 +127,14 @@ export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
                                 size="large"
                                 aria-label="show 17 new notifications"
                                 color="inherit">
-                                <Badge badgeContent={4} color="secondary">
+                                <Badge badgeContent={notificationCount || 0} color="secondary">
                                     <NotificationsIcon />
                                 </Badge>
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Open settings">
                             <IconButton onClick={onOpenUserMenu} className={classes.avatarButton}>
-                                <Avatar alt="Jonathan" src={profile} className={classes.avatar} />
+                                <Avatar alt="Jonathan" src={image_url ?? profile} className={classes.avatar} />
                             </IconButton>
                         </Tooltip>
                         <Menu

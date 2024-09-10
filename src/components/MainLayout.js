@@ -11,8 +11,8 @@ import { useNavigate } from 'react-router';
 import { LocationLayout } from './LocationLayout';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions } from '../redux/actions';
+import car from "../assets/vehicles/urus.jpg";
 import utils from '../utils';
-import vehicles from "../assets/vehicles/urus.jpg";
 
 const url = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_BACKEND_URL : process.env.REACT_APP_DEV_BACKEND_URL;
 const useStyles = makeStyles({
@@ -49,7 +49,7 @@ const useStyles = makeStyles({
 const initialVehicles = {
     "name": "Lamborgini Urus",
     "description": "2500 cc",
-    "image_url": vehicles
+    "image_url": car
 }
 export const MainLayout = () => {
     const navigate = useNavigate();
@@ -65,10 +65,16 @@ export const MainLayout = () => {
     const newUser = useSelector(state => state.appReducer.user);
     const path = window.location.pathname.split('/').pop();
     const isNotification = path === 'notifications';
-    const auth = utils.auth;
-    const ssoUser = auth?.currentUser;
+    const ssoUser = localStorage.getItem('user');
+    const loggedUser = JSON.parse(ssoUser);
     const role = localStorage.getItem('role');
     const isAdmin = role && role.toLowerCase() === 'admin';
+    const adminId = localStorage.getItem('adminId');
+    const userId = localStorage.getItem('userId');
+    const storeId = localStorage.getItem('id');
+    const loggedInId = isAdmin ? adminId : userId;
+    const id = storeId ?? loggedInId;
+    const [notificationCount, setNotificationCount] = useState(0);
 
     const getUserDetails = useCallback(async () => {
         const id = localStorage.getItem("id");
@@ -110,7 +116,7 @@ export const MainLayout = () => {
             );
             if (response.data.success) {
                 const vehiclesData = response.data.data[0];
-                localStorage.setItem('vehicles', vehiclesData);
+                localStorage.setItem('vehicles', JSON.stringify(vehiclesData));
                 setVehicles(vehiclesData);
                 navigate("/Main");
             } else {
@@ -151,6 +157,12 @@ export const MainLayout = () => {
         } else {
             getVehicles();
         }
+        const fetchData = async () => {
+            const newNotifications = await utils.fetchNotifications({ id, isAdmin })
+            setNotificationCount(newNotifications?.length || 0)
+            localStorage.setItem('notifications', JSON.stringify(newNotifications));
+        }
+        fetchData();
         setIsLocationCardVisible(isLocationCard && chooseLocation && slideRight);
     }, [getUserDetails, getVehicles, isLocationCard, chooseLocation, slideRight]); //chooseLocation, slideRight remove if failing
 
@@ -216,6 +228,14 @@ export const MainLayout = () => {
     };
     const isVehicleData = vehicles === undefined || vehicles === null || vehicles === "undefined";
     const vehiclesData = isVehicleData ? initialVehicles : vehicles;
+    const isJson = utils.isValidJSONString(vehiclesData);
+    const vehicleDetails = isJson ? JSON.parse(vehiclesData) : vehiclesData;;
+    if (vehicleDetails && isJson) {
+        // if (url && !(url.startsWith('http://') || url.startsWith('https://'))) {
+        //     url = `http://localhost:3000${url}`;
+        // }
+        vehicleDetails.image_url = car;
+    }
     return (
         <Box sx={{ flexGrow: 1 }}>
             {!isNotification &&
@@ -223,17 +243,18 @@ export const MainLayout = () => {
                     onOpenUserMenu={handleOpenUserMenu}
                     anchorElUser={anchorElUser}
                     onCloseUserMenu={handleCloseUserMenu}
+                    notificationCount={notificationCount}
                 />
             }
             <Box sx={{ p: 2 }}>
                 <Typography className={classes.welcomeText}>
-                    {` Hey,`} <span className={classes.user}>{`${ssoUser?.displayName || user?.name || 'User'}`}</span>
+                    {` Hey,`} <span className={classes.user}>{`${loggedUser?.name || 'User'}`}</span>
                 </Typography>
                 <Typography className={classes.openText}>
                     {` Request Gate to be opened`}
                 </Typography>
                 <CommonCard details={apartmentDetails} />
-                <CommonCard details={vehiclesData} />
+                <CommonCard details={vehicleDetails} />
                 {!isAdmin &&
                     <>
                         <Typography className={classes.slideMessage}>

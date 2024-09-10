@@ -143,6 +143,7 @@ export const AuthLayout = () => {
                     localStorage.setItem('token', response.data.token);
                     localStorage.setItem('id', response.data.id);
                     localStorage.setItem('role', response.data.role);
+                    localStorage.setItem('user', JSON.stringify(response.data));
                     if (response.data.role === 'admin') {
                         localStorage.setItem('adminId', response.data.id);
                     } else {
