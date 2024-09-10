@@ -109,7 +109,6 @@ export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu, notifica
         };
         fetchLocation();
     }, []);
-    const address = location && `${location.city},  ${location.country}`;
 
     return (
         <AppBar position="static" className={classes.appBar} color="default">
@@ -117,7 +116,7 @@ export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu, notifica
                 <Toolbar disableGutters className={classes.toolbar}>
                     <Button component="div" className={classes.locationContainer}>
                         <img alt="Map" src={map} className={classes.location} />
-                        <Typography className={classes.locationText}>{address || `Kahawa, Nairobi`}</Typography>
+                        <Typography className={classes.locationText}>{location || `Kahawa, Nairobi`}</Typography>
                     </Button>
                     <Box sx={{ flexGrow: 0 }}>
                         <Tooltip title="Notifications">
