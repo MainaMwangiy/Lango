@@ -43,7 +43,9 @@ const NotificationLayout = () => {
     const adminId = localStorage.getItem('adminId');
     const userId = localStorage.getItem('userId');
     const isAdmin = role && role.toLowerCase() === 'admin';
-    const id = isAdmin ? adminId : userId;
+    const storeId = localStorage.getItem('id');
+    const loggedInId = isAdmin ? adminId : userId;
+    const id = storeId ?? loggedInId;
     const path = window.location.pathname.split('/').pop();
     const isMain = path === 'Main';
     const not = localStorage.getItem('notifications');

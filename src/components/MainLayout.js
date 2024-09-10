@@ -71,7 +71,9 @@ export const MainLayout = () => {
     const isAdmin = role && role.toLowerCase() === 'admin';
     const adminId = localStorage.getItem('adminId');
     const userId = localStorage.getItem('userId');
-    const id = isAdmin ? adminId : userId;
+    const storeId = localStorage.getItem('id');
+    const loggedInId = isAdmin ? adminId : userId;
+    const id = storeId ?? loggedInId;
     const [notificationCount, setNotificationCount] = useState(0);
 
     const getUserDetails = useCallback(async () => {

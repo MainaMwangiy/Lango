@@ -153,9 +153,15 @@ const utils = {
         }
     },
     fetchNotifications: async ({ id, isAdmin }) => {
+        if (isAdmin === null || isAdmin === undefined || !isAdmin) {
+            isAdmin = false;
+        };
+        const newId = typeof id === 'string' ? id : id.toString();
         const endpoint = isAdmin ? `/api/notifications/all` : `/api/notifications/user`;
         try {
-            const response = await axios.post(`${utils.baseUrl}${endpoint}`, id);
+            const response = await axios.post(`${utils.baseUrl}${endpoint}`, { id: newId }, {
+                headers: { 'Content-Type': 'application/json' },
+            });
             return response?.data?.data;
         } catch (error) {
             console.error('Failed to fetch notifications:', error);
