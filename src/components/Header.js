@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { AppBar, Box, Toolbar, IconButton, Typography, Menu, MenuItem, Container, Avatar, Tooltip, Badge, Button } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { makeStyles } from '@material-ui/core';
@@ -8,6 +8,7 @@ import theme from '../theme';
 import { useNavigate } from 'react-router';
 import { useDispatch } from 'react-redux';
 import { actions } from '../redux/actions';
+import utils from '../utils';
 
 const useStyles = makeStyles({
     appBar: {
@@ -63,6 +64,7 @@ export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
     const classes = useStyles();
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [location, setLocation] = useState({});
     const user = localStorage.getItem('user');
     if (!user) {
         console.log("User Not Found")
@@ -99,13 +101,23 @@ export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
             onCloseUserMenu();
         }
     };
+
+    useEffect(() => {
+        const fetchLocation = async () => {
+            const location = await utils.getLocationFromIP();
+            setLocation(location)
+        };
+        fetchLocation();
+    }, []);
+    const address = `${location.city},  ${location.country}`;
+
     return (
         <AppBar position="static" className={classes.appBar} color="default">
             <Container maxWidth="xl">
                 <Toolbar disableGutters className={classes.toolbar}>
                     <Button component="div" className={classes.locationContainer}>
                         <img alt="Map" src={map} className={classes.location} />
-                        <Typography className={classes.locationText}>{`Kahawa, Nairobi`}</Typography>
+                        <Typography className={classes.locationText}>{address || `Kahawa, Nairobi`}</Typography>
                     </Button>
                     <Box sx={{ flexGrow: 0 }}>
                         <Tooltip title="Notifications">
