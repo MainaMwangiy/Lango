@@ -69,7 +69,7 @@ const utils = {
             });
             if (response && response?.status === utils.statusCode) {
                 const userData = await response.data;
-                localStorage.setItem('user', newUser);
+                localStorage.setItem('user', JSON.stringify(newUser));
                 localStorage.setItem('id', userData.user_id);
                 dispatch({ type: actions.LOAD_USER, user: user })
                 navigate('/Main');
@@ -117,7 +117,7 @@ const utils = {
             });
             if (response && response?.status === utils.statusCode) {
                 const userData = await response.data;
-                localStorage.setItem('user', newUser);
+                localStorage.setItem('user', JSON.stringify(newUser));
                 localStorage.setItem('id', userData.user_id);
                 dispatch({ type: actions.LOAD_USER, user: user })
                 navigate('/Main');

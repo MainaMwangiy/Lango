@@ -63,7 +63,12 @@ export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
     const classes = useStyles();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-
+    const user = localStorage.getItem('user');
+    if (!user) {
+        console.log("User Not Found")
+    }
+    const newUser = JSON.parse(user);
+    const { image_url } = newUser;
     const toggleNotifications = () => {
         navigate('/notifications')
         dispatch({ type: actions.LOAD_NOTIFICATION, openNotification: true });
@@ -71,15 +76,19 @@ export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
             dispatch({ type: actions.LOAD_NOTIFICATION, openNotification: false });
         })
     };
+    const clearCookies = () => {
+        const cookies = document.cookie.split(";");
+        cookies.forEach((cookie) => {
+            const cookieName = cookie.split("=")[0].trim();
+            document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        });
+    };
+
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('id');
-        localStorage.removeItem('user');
-        localStorage.removeItem('role');
-        localStorage.removeItem('adminId');
-        localStorage.removeItem('userId');
-        localStorage.removeItem('vehicles');
+        clearCookies();
+        localStorage.clear();
+        sessionStorage.clear();
         navigate('/login');
     };
 
@@ -113,7 +122,7 @@ export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
                         </Tooltip>
                         <Tooltip title="Open settings">
                             <IconButton onClick={onOpenUserMenu} className={classes.avatarButton}>
-                                <Avatar alt="Jonathan" src={profile} className={classes.avatar} />
+                                <Avatar alt="Jonathan" src={image_url ?? profile} className={classes.avatar} />
                             </IconButton>
                         </Tooltip>
                         <Menu

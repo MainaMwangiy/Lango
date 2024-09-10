@@ -65,8 +65,8 @@ export const MainLayout = () => {
     const newUser = useSelector(state => state.appReducer.user);
     const path = window.location.pathname.split('/').pop();
     const isNotification = path === 'notifications';
-    const auth = utils.auth;
-    const ssoUser = auth?.currentUser;
+    const ssoUser = localStorage.getItem('user');
+    const loggedUser = JSON.parse(ssoUser);
     const role = localStorage.getItem('role');
     const isAdmin = role && role.toLowerCase() === 'admin';
 
@@ -110,7 +110,7 @@ export const MainLayout = () => {
             );
             if (response.data.success) {
                 const vehiclesData = response.data.data[0];
-                localStorage.setItem('vehicles', vehiclesData);
+                localStorage.setItem('vehicles', JSON.stringify(vehiclesData));
                 setVehicles(vehiclesData);
                 navigate("/Main");
             } else {
@@ -227,7 +227,7 @@ export const MainLayout = () => {
             }
             <Box sx={{ p: 2 }}>
                 <Typography className={classes.welcomeText}>
-                    {` Hey,`} <span className={classes.user}>{`${ssoUser?.displayName || user?.name || 'User'}`}</span>
+                    {` Hey,`} <span className={classes.user}>{`${loggedUser?.name || 'User'}`}</span>
                 </Typography>
                 <Typography className={classes.openText}>
                     {` Request Gate to be opened`}
