@@ -60,7 +60,7 @@ const useStyles = makeStyles({
 
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
-export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
+export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu, notificationCount }) => {
     const classes = useStyles();
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -109,7 +109,7 @@ export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
         };
         fetchLocation();
     }, []);
-    const address = `${location.city},  ${location.country}`;
+    const address = location && `${location.city},  ${location.country}`;
 
     return (
         <AppBar position="static" className={classes.appBar} color="default">
@@ -127,7 +127,7 @@ export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu }) => {
                                 size="large"
                                 aria-label="show 17 new notifications"
                                 color="inherit">
-                                <Badge badgeContent={4} color="secondary">
+                                <Badge badgeContent={notificationCount || 0} color="secondary">
                                     <NotificationsIcon />
                                 </Badge>
                             </IconButton>

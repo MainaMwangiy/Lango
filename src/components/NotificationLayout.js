@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import NotificationHeader from '../common/NotificationHeader';
 import MailIcon from '@mui/icons-material/Mail';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
@@ -8,13 +7,8 @@ import CommentIcon from '@mui/icons-material/Comment';
 import SubscriptionIcon from '@mui/icons-material/Subscriptions';
 import { Avatar, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
 import dayjs from 'dayjs';
+import utils from '../utils';
 // import { useSelector } from 'react-redux';
-
-const url =
-    process.env.NODE_ENV === 'production'
-        ? process.env.REACT_APP_PROD_BACKEND_URL
-        : process.env.REACT_APP_DEV_BACKEND_URL;
-
 const getIcon = (type) => {
     switch (type) {
         case 'message':
@@ -52,19 +46,20 @@ const NotificationLayout = () => {
     const id = isAdmin ? adminId : userId;
     const path = window.location.pathname.split('/').pop();
     const isMain = path === 'Main';
+    const not = localStorage.getItem('notifications');
+    const oldNotifications = JSON.parse(not);
     // const openNotification = useSelector(state => state.location.openNotification);
 
     useEffect(() => {
-        const fetchNotifications = async () => {
-            const endpoint = isAdmin ? `/api/notifications/all` : `/api/notifications/user`;
-            try {
-                const response = await axios.post(`${url}${endpoint}`, id);
-                setNotifications(response?.data?.data);
-            } catch (error) {
-                console.error('Failed to fetch notifications:', error);
-            }
-        };
-        fetchNotifications();
+        const fetchData = async () => {
+            const newNotifications = await utils.fetchNotifications({ id, isAdmin })
+            setNotifications(newNotifications);
+        }
+        if (oldNotifications) {
+            setNotifications(oldNotifications);
+        } else {
+            fetchData();
+        }
     }, [isAdmin, id]);
 
     return (

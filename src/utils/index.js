@@ -37,6 +37,7 @@ const utils = {
     statusCode: 200 || 201,
     adminUser: ["Admin", "User"],
     normalUser: ["User"],
+    baseUrl: process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_BACKEND_URL : process.env.REACT_APP_DEV_BACKEND_URL,
     gitHubSignIn: async ({ navigate, dispatch }) => {
         const token = localStorage.getItem('token');
         const isToken = token === null || token === '';
@@ -134,6 +135,7 @@ const utils = {
         }
     },
     isValidJSONString: (value) => {
+        if (value === null || value === undefined || !value) return false;
         try {
             JSON.parse(value);
             return true;
@@ -149,8 +151,16 @@ const utils = {
         } catch (error) {
             console.error('Error fetching location from IP:', error);
         }
+    },
+    fetchNotifications: async ({ id, isAdmin }) => {
+        const endpoint = isAdmin ? `/api/notifications/all` : `/api/notifications/user`;
+        try {
+            const response = await axios.post(`${utils.baseUrl}${endpoint}`, id);
+            return response?.data?.data;
+        } catch (error) {
+            console.error('Failed to fetch notifications:', error);
+        }
     }
-
 };
 
 export default utils;

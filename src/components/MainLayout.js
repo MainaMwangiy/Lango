@@ -69,6 +69,10 @@ export const MainLayout = () => {
     const loggedUser = JSON.parse(ssoUser);
     const role = localStorage.getItem('role');
     const isAdmin = role && role.toLowerCase() === 'admin';
+    const adminId = localStorage.getItem('adminId');
+    const userId = localStorage.getItem('userId');
+    const id = isAdmin ? adminId : userId;
+    const [notificationCount, setNotificationCount] = useState(0);
 
     const getUserDetails = useCallback(async () => {
         const id = localStorage.getItem("id");
@@ -151,6 +155,12 @@ export const MainLayout = () => {
         } else {
             getVehicles();
         }
+        const fetchData = async () => {
+            const newNotifications = await utils.fetchNotifications({ id, isAdmin })
+            setNotificationCount(newNotifications?.length || 0)
+            localStorage.setItem('notifications', JSON.stringify(newNotifications));
+        }
+        fetchData();
         setIsLocationCardVisible(isLocationCard && chooseLocation && slideRight);
     }, [getUserDetails, getVehicles, isLocationCard, chooseLocation, slideRight]); //chooseLocation, slideRight remove if failing
 
@@ -231,6 +241,7 @@ export const MainLayout = () => {
                     onOpenUserMenu={handleOpenUserMenu}
                     anchorElUser={anchorElUser}
                     onCloseUserMenu={handleCloseUserMenu}
+                    notificationCount={notificationCount}
                 />
             }
             <Box sx={{ p: 2 }}>
