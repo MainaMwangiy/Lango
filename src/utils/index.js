@@ -132,6 +132,14 @@ const utils = {
             localStorage.removeItem('token');
             navigate('/login');
         }
+    },
+    isValidJSONString: (value) => {
+        try {
+            JSON.parse(value);
+            return true;
+        } catch (error) {
+            return false;
+        }
     }
 };
 

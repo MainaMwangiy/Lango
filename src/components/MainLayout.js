@@ -11,8 +11,8 @@ import { useNavigate } from 'react-router';
 import { LocationLayout } from './LocationLayout';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions } from '../redux/actions';
+import car from "../assets/vehicles/urus.jpg";
 import utils from '../utils';
-import vehicles from "../assets/vehicles/urus.jpg";
 
 const url = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_BACKEND_URL : process.env.REACT_APP_DEV_BACKEND_URL;
 const useStyles = makeStyles({
@@ -49,7 +49,7 @@ const useStyles = makeStyles({
 const initialVehicles = {
     "name": "Lamborgini Urus",
     "description": "2500 cc",
-    "image_url": vehicles
+    "image_url": car
 }
 export const MainLayout = () => {
     const navigate = useNavigate();
@@ -216,6 +216,14 @@ export const MainLayout = () => {
     };
     const isVehicleData = vehicles === undefined || vehicles === null || vehicles === "undefined";
     const vehiclesData = isVehicleData ? initialVehicles : vehicles;
+    const isJson = utils.isValidJSONString(vehiclesData);
+    const vehicleDetails = isJson ? JSON.parse(vehiclesData) : vehiclesData;;
+    if (vehicleDetails && isJson) {
+        // if (url && !(url.startsWith('http://') || url.startsWith('https://'))) {
+        //     url = `http://localhost:3000${url}`;
+        // }
+        vehicleDetails.image_url = car;
+    }
     return (
         <Box sx={{ flexGrow: 1 }}>
             {!isNotification &&
@@ -233,7 +241,7 @@ export const MainLayout = () => {
                     {` Request Gate to be opened`}
                 </Typography>
                 <CommonCard details={apartmentDetails} />
-                <CommonCard details={vehiclesData} />
+                <CommonCard details={vehicleDetails} />
                 {!isAdmin &&
                     <>
                         <Typography className={classes.slideMessage}>
