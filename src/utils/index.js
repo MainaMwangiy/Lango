@@ -3,8 +3,9 @@ import { actions } from "../redux/actions";
 import { initializeApp } from "firebase/app";
 import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
+import countries from 'i18n-iso-countries';
 uuidv4();
-
+countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_GITHUB_SSO_API_KEY,
     authDomain: process.env.REACT_APP_GITHUB_SSO_AUTH_DOMAIN,
@@ -145,9 +146,11 @@ const utils = {
     },
     getLocationFromIP: async () => {
         try {
-            const response = await fetch('http://ip-api.com/json/');
+            const response = await fetch('https://ipinfo.io/json');
             const data = await response.json();
-            return data;
+            const countryCode = data.country;
+            const countryName = countries.getName(countryCode, "en");
+            return `${data?.city}, ${countryName}`;
         } catch (error) {
             console.error('Error fetching location from IP:', error);
         }
