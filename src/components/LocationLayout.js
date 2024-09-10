@@ -89,7 +89,9 @@ export const LocationLayout = ({ onConfirm }) => {
     const adminId = localStorage.getItem('adminId');
     const userId = localStorage.getItem('userId');
     const isAdmin = role && role.toLowerCase() === 'admin';
-    const id = isAdmin ? adminId : userId;
+    const storeId = localStorage.getItem('id');
+    const loggedInId = isAdmin ? adminId : userId;
+    const id = storeId ?? loggedInId;
     const adminNotification = "Remember to pay money for trash by Tuesday";
     const userNotification = "The security guard has been notified to open the gate."
     const content = isAdmin ? adminNotification : userNotification;

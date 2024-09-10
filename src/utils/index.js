@@ -37,6 +37,7 @@ const utils = {
     statusCode: 200 || 201,
     adminUser: ["Admin", "User"],
     normalUser: ["User"],
+    baseUrl: process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_BACKEND_URL : process.env.REACT_APP_DEV_BACKEND_URL,
     gitHubSignIn: async ({ navigate, dispatch }) => {
         const token = localStorage.getItem('token');
         const isToken = token === null || token === '';
@@ -69,7 +70,7 @@ const utils = {
             });
             if (response && response?.status === utils.statusCode) {
                 const userData = await response.data;
-                localStorage.setItem('user', newUser);
+                localStorage.setItem('user', JSON.stringify(newUser));
                 localStorage.setItem('id', userData.user_id);
                 dispatch({ type: actions.LOAD_USER, user: user })
                 navigate('/Main');
@@ -117,7 +118,7 @@ const utils = {
             });
             if (response && response?.status === utils.statusCode) {
                 const userData = await response.data;
-                localStorage.setItem('user', newUser);
+                localStorage.setItem('user', JSON.stringify(newUser));
                 localStorage.setItem('id', userData.user_id);
                 dispatch({ type: actions.LOAD_USER, user: user })
                 navigate('/Main');
@@ -131,6 +132,39 @@ const utils = {
             console.error('Google sign-in failed:', error);
             localStorage.removeItem('token');
             navigate('/login');
+        }
+    },
+    isValidJSONString: (value) => {
+        if (value === null || value === undefined || !value) return false;
+        try {
+            JSON.parse(value);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    },
+    getLocationFromIP: async () => {
+        try {
+            const response = await fetch('http://ip-api.com/json/');
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching location from IP:', error);
+        }
+    },
+    fetchNotifications: async ({ id, isAdmin }) => {
+        if (isAdmin === null || isAdmin === undefined || !isAdmin) {
+            isAdmin = false;
+        };
+        const newId = typeof id === 'string' ? id : id.toString();
+        const endpoint = isAdmin ? `/api/notifications/all` : `/api/notifications/user`;
+        try {
+            const response = await axios.post(`${utils.baseUrl}${endpoint}`, { id: newId }, {
+                headers: { 'Content-Type': 'application/json' },
+            });
+            return response?.data?.data;
+        } catch (error) {
+            console.error('Failed to fetch notifications:', error);
         }
     }
 };
