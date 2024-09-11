@@ -86,8 +86,8 @@ export const MainLayout = () => {
             );
             if (response.data.success) {
                 const userData = response.data.data[0];
-                localStorage.setItem('user', JSON.stringify(userData));
-                dispatch({ type: actions.LOAD_USER, user: userData })
+                localStorage.setItem('user', JSON.stringify(userData || user));
+                dispatch({ type: actions.LOAD_USER, user: userData || user })
                 setUser(userData);
                 navigate("/Main");
             } else {
@@ -104,7 +104,7 @@ export const MainLayout = () => {
                 text: "User Loading Failed",
             });
         }
-    }, [navigate]);
+    }, [navigate, dispatch, user]);
 
     const getVehicles = useCallback(async () => {
         const id = localStorage.getItem("id");
@@ -164,7 +164,7 @@ export const MainLayout = () => {
         }
         fetchData();
         setIsLocationCardVisible(isLocationCard && chooseLocation && slideRight);
-    }, [getUserDetails, getVehicles, isLocationCard, chooseLocation, slideRight]); //chooseLocation, slideRight remove if failing
+    }, [getUserDetails, getVehicles, isLocationCard, chooseLocation, slideRight, id, isAdmin, newUser]); //chooseLocation, slideRight remove if failing
 
 
     const handleSlide = () => {

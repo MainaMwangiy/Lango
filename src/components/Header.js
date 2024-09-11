@@ -64,7 +64,7 @@ export const Header = ({ onOpenUserMenu, anchorElUser, onCloseUserMenu, notifica
     const classes = useStyles();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [location, setLocation] = useState({});
+    const [location, setLocation] = useState("");
     const user = localStorage.getItem('user');
     if (!user) {
         console.log("User Not Found")

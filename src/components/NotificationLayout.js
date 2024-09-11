@@ -62,7 +62,7 @@ const NotificationLayout = () => {
         } else {
             fetchData();
         }
-    }, [isAdmin, id]);
+    }, [isAdmin, id, oldNotifications]);
 
     return (
         <div style={{ paddingLeft: '10px', paddingRight: '10px' }}>
