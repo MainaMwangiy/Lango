@@ -4,8 +4,8 @@ import theme from '../theme';
 import config from './config';
 import { Button, Typography } from '@mui/material';
 import { Loader } from './Loader';
-import { useNavigate } from 'react-router';
 import homeBackground from '../assets/home.svg';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles({
     root: (props) => ({
