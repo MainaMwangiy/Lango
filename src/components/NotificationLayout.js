@@ -5,9 +5,11 @@ import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import SecurityIcon from '@mui/icons-material/Security';
 import CommentIcon from '@mui/icons-material/Comment';
 import SubscriptionIcon from '@mui/icons-material/Subscriptions';
-import { Avatar, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
+import { Avatar, Card, CardActionArea, CardContent, Typography } from '@mui/material';
 import dayjs from 'dayjs';
 import utils from '../utils';
+import { useNavigate } from 'react-router-dom';
+import { makeStyles } from '@material-ui/core';
 // import { useSelector } from 'react-redux';
 const getIcon = (type) => {
     switch (type) {
@@ -36,6 +38,22 @@ const getIcon = (type) => {
 //             return '#ffffff';
 //     }
 // };
+const useStyles = makeStyles((theme) => ({
+    card: {
+        marginBottom: theme.spacing(2),
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
+    },
+    avatar: {
+        backgroundColor: theme.palette.secondary.main,
+    },
+    readBorder: {
+        borderLeft: `6px solid ${theme.palette.grey[300]}`,
+    },
+    unreadBorder: {
+        borderLeft: `6px solid ${theme.palette.primary.main}`,
+    }
+}));
 
 const NotificationLayout = () => {
     const [notifications, setNotifications] = useState([]);
@@ -50,8 +68,8 @@ const NotificationLayout = () => {
     const isMain = path === 'Main';
     const not = localStorage.getItem('notifications');
     const oldNotifications = JSON.parse(not);
-    // const openNotification = useSelector(state => state.location.openNotification);
-
+    const classes = useStyles();
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchData = async () => {
             const newNotifications = await utils.fetchNotifications({ id, isAdmin })
@@ -62,48 +80,42 @@ const NotificationLayout = () => {
         } else {
             fetchData();
         }
-    }, [isAdmin, id, oldNotifications]);
+        // eslint-disable-next-line
+    }, [isAdmin]);
+
+    const handleNotificationClick = (notification) => {
+        navigate(`/notifications/${notification.notification_id}`, { state: { notification } });
+    };
 
     return (
-        <div style={{ paddingLeft: '10px', paddingRight: '10px' }}>
+        <div style={{ padding: '10px' }}>
             {!isMain &&
                 <>
                     <NotificationHeader onDeleteNotifications={() => console.log('Delete all notifications')} />
                 </>
             }
-            <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-                {notifications.map((notification) => (
-                    <React.Fragment key={notification.notification_id}>
-                        <ListItem alignItems="flex-start"
-                        // sx={{bgcolor: getStatusColor(notification.status)}}
-                        >
-                            <ListItemAvatar>
-                                <Avatar>
+            {notifications.map((notification) => {
+                const borderClass = notification.status === 'read' ? classes.readBorder : classes.unreadBorder;
+                return (
+                    <Card key={notification.notification_id} className={`${classes.card} ${borderClass}`}>
+                        <CardActionArea onClick={() => handleNotificationClick(notification)}>
+                            <CardContent>
+                                <Avatar className={classes.avatar}>
                                     {getIcon(notification.notification_type)}
                                 </Avatar>
-                            </ListItemAvatar>
-                            <ListItemText
-                                primary={notification.content}
-                                secondary={
-                                    <React.Fragment>
-                                        <Typography
-                                            sx={{ display: 'inline' }}
-                                            component="span"
-                                            variant="body2"
-                                            color="text.primary"
-                                        >
-                                            {`Status: ${notification.status.charAt(0).toUpperCase() + notification.status.slice(1)}`}
-                                        </Typography>
-                                        {" — "}
-                                        {dayjs(notification.created_at).format('DD-MM-YYYY')}
-                                    </React.Fragment>
-                                }
-                            />
-                        </ListItem>
-                        <Divider variant="inset" component="li" />
-                    </React.Fragment>
-                ))}
-            </List>
+                                <Typography variant="h6" component="div">
+                                    {notification.content}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    {`Status: ${notification.status.charAt(0).toUpperCase() + notification.status.slice(1)}`}
+                                    {" — "}
+                                    {dayjs(notification.created_at).format('DD-MM-YYYY')}
+                                </Typography>
+                            </CardContent>
+                        </CardActionArea>
+                    </Card>
+                );
+            })}
         </div>
     );
 };

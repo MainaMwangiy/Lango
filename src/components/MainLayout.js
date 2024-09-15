@@ -7,12 +7,12 @@ import { makeStyles } from '@material-ui/core';
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import { useNavigate } from 'react-router';
 import { LocationLayout } from './LocationLayout';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions } from '../redux/actions';
 import car from "../assets/vehicles/urus.jpg";
 import utils from '../utils';
+import { useNavigate } from 'react-router-dom';
 
 const url = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_BACKEND_URL : process.env.REACT_APP_DEV_BACKEND_URL;
 const useStyles = makeStyles({

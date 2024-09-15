@@ -12,6 +12,7 @@ import { Provider } from 'react-redux';
 import NotificationLayout from './components/NotificationLayout';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { store } from './redux/store';
+import NotificationDetails from './pages/Notifications';
 
 function App() {
   const [isNewVersionAvailable, setIsNewVersionAvailable] = useState(false);
@@ -62,6 +63,7 @@ function App() {
           <Route path="/Login" element={<AuthLayout />} />
           <Route path="/Main" element={<PrivateRoute authenticated={true} component={MainLayout} />} />
           <Route path="/notifications" element={<PrivateRoute authenticated={true} component={NotificationLayout} />} />
+          <Route path="/notifications/:notificationId" element={<PrivateRoute authenticated={true} component={NotificationDetails} />} />
         </Routes>
       </BrowserRouter>
     </Provider>
