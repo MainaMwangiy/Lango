@@ -5,10 +5,10 @@ import { makeStyles } from '@material-ui/core';
 import profile from "../assets/profile.svg";
 import map from "../assets/map.svg";
 import theme from '../theme';
-import { useNavigate } from 'react-router';
 import { useDispatch } from 'react-redux';
 import { actions } from '../redux/actions';
 import utils from '../utils';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles({
     appBar: {

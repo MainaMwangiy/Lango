@@ -125,7 +125,7 @@ export const LocationLayout = ({ onConfirm }) => {
             const response = await axios.post(`${url}${endpoint}`, notification, {
                 headers: { 'Content-Type': 'application/json' },
             });
-            console.log("response", response)
+            localStorage.setItem('notification', JSON.stringify(response?.data?.data || ''))
         } catch (error) {
             console.error('Failed to fetch notifications:', error);
         }

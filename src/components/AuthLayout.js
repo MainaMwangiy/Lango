@@ -4,7 +4,6 @@ import { makeStyles } from '@material-ui/core';
 import { Button, IconButton, InputAdornment, TextField } from '@mui/material';
 import { GitHub, Google } from '@mui/icons-material';
 import theme from '../theme';
-import { useNavigate } from 'react-router';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -12,6 +11,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useDispatch } from 'react-redux';
 import utils from '../utils';
 import { actions } from '../redux/actions';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles({
     root: {
